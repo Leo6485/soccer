@@ -2,6 +2,7 @@ import json
 from math import sqrt
 from time import sleep
 from os import _exit
+from time import time
 
 from server import Server
 
@@ -32,6 +33,11 @@ class Game:
             if distancia < 110:
                 self.ball.vel[0] -= d[0]
                 self.ball.vel[1] -= d[1]
+            
+            att_ts = player.get("attack_ts", 0)
+            if time() - att_ts < 0.5:
+                print(f"Player atacou {int(time())}")
+
 
         self.ball.pos[0] += self.ball.vel[0]
         self.ball.pos[1] += self.ball.vel[1]
@@ -45,7 +51,7 @@ game = Game()
 @app.route("CONNECT")
 def connect(data, addr):
     player_id = len(game.players)
-    player_data = {"addr": addr, "pos": [0, 0], "id": player_id}
+    player_data = {"addr": addr, "pos": [0, 0], "id": player_id, "attack_ts": 0}
     game.players.append(player_data)
     game.clients.append(addr)
 
@@ -58,6 +64,8 @@ def update(data, addr):
     for player in game.players:
         if player["id"] == data["id"]:
             player["pos"] = data["pos"]
+            player["attack_ts"] = data["attack_ts"]
+            player["cursor_pos"] = data["cursor_pos"]
 
 @app.route("QUIT")
 def quit(data, addr):

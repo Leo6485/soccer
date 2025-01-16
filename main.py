@@ -12,7 +12,7 @@ def draw_grid(surface, color, cell_size):
         pg.draw.line(surface, color, (0, y), (width, y), width=4)
 
 pg.init()
-pg.mouse.set_visible(0)
+pg.mouse.set_visible(1)
 d = pg.display.Info()
 DW, DH = d.current_w, d.current_h
 del d
@@ -51,7 +51,7 @@ class Cursor:
 
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
         print(self.last_cursor_pos.x)
-        if not (150 < self.last_cursor_pos.x < DW - 150) or not (50 < self.last_cursor_pos.y < DH - 50):
+        if not (DW/8 < self.last_cursor_pos.x < DW/8) or not (DH/8 < self.last_cursor_pos.y < DH/8):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
 
@@ -62,7 +62,7 @@ class Player:
         self.pos = pg.Vector2(100, 100)
         self.size = 25
         self.life = 100
-        self.is_fire = 0
+        self.attack_ts = 0
         self.cursor = Cursor()
         self.name = "Osvaldo"
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
@@ -88,6 +88,9 @@ class Player:
 
             self.pos.x += nx * d
             self.pos.y += ny * d
+        
+        if pressed[pg.K_a]:
+            self.attack_ts = time()
 
     def draw(self, screen):
         pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 5)
@@ -118,13 +121,13 @@ class Ball:
 
 class Game:
     def __init__(self, app):
-        self.screen = pg.display.set_mode((1200, 720), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
         self.app = app
         self.player = Player(-1)
         self.players = {}
 
         data = {"type": "CONNECT", "data": {}}
-        self.app.send(json.dumps(data), ("192.168.0.109", 5454))
+        self.app.send(json.dumps(data), ("172.18.1.92", 5454))
 
         self.ball = Ball()
 
@@ -145,7 +148,17 @@ class Game:
 
         self.player.update(pressed, mouse_pressed, self.ball)
         
-        self.app.send(json.dumps({"type": "update", "data": {"pos": list(self.player.pos), "id": self.player.id}}), ("192.168.0.109", 5454))
+        player_data = {
+                        "type": "update",
+                        "data": {
+                                    "pos": list(self.player.pos),
+                                    "id": self.player.id,
+                                    "attack_ts": self.player.attack_ts, 
+                                    "cursor_pos": list(self.player.cursor.pos)
+                                }
+                      }
+
+        self.app.send(json.dumps(player_data), ("172.18.1.92", 5454))
 
     def draw(self):
         self.screen.fill(BG_COLOR)
