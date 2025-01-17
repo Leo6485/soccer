@@ -35,8 +35,11 @@ class Game:
                 self.ball.vel[1] -= d[1]
             
             att_ts = player.get("attack_ts", 0)
-            
-            if time() - att_ts < 0.5:
+            last_att = player.get("last_attack", 0)
+
+            # Delay aceito e cooldown
+            if time() - att_ts < 0.5 and att_ts - last_att > 1:
+                player["last_attack"] = time()
                 print(f"Player atacou {id} na posição {player['cursor_pos']}")
 
 
@@ -52,7 +55,7 @@ game = Game()
 @app.route("CONNECT")
 def connect(data, addr):
     player_id = len(game.players)
-    player_data = {"addr": addr, "pos": [0, 0], "id": player_id, "attack_ts": 0}
+    player_data = {"addr": addr, "pos": [0, 0], "id": player_id, "attack_ts": 0, "last_attack": 0}
     game.players[player_id] = player_data
     game.clients.append(addr)
 

@@ -48,6 +48,7 @@ class Player:
         self.size = 25
         self.life = 100
         self.attack_ts = 0
+        self.last_attack = 0
         self.cursor = Cursor()
         self.name = "Osvaldo"
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
