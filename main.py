@@ -51,7 +51,7 @@ class Cursor:
 
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
         print(self.last_cursor_pos.x)
-        if not (DW/8 < self.last_cursor_pos.x < DW/8) or not (DH/8 < self.last_cursor_pos.y < DH/8):
+        if not (DW/8 < self.last_cursor_pos.x < 7 * DW/8) or not (DH/8 < self.last_cursor_pos.y < 7 * DH/8):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
 
@@ -69,6 +69,7 @@ class Player:
         self.id = id
         self.team = self.id % 2 + 1
         self.current_frame = 0
+        self.data = {"pos": [0, 0], "id": id}
 
     def update(self, pressed, mouse_pressed, ball):
         self.cursor.update()
@@ -91,7 +92,16 @@ class Player:
         
         if pressed[pg.K_a]:
             self.attack_ts = time()
+        
+        self.update_data()
 
+    def update_data(self):
+        self.data =  {
+                        "pos": list(self.pos),
+                        "id": self.id,
+                        "attack_ts": self.attack_ts, 
+                        "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y]
+                     }
     def draw(self, screen):
         pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 5)
         pg.draw.circle(screen, GREEN, (int(self.pos.x), int(self.pos.y)), self.size)
@@ -153,12 +163,7 @@ class Game:
         
         player_data = {
                         "type": "update",
-                        "data": {
-                                    "pos": list(self.player.pos),
-                                    "id": self.player.id,
-                                    "attack_ts": self.player.attack_ts, 
-                                    "cursor_pos": [self.player.cursor.pos.x + self.player.pos.x, self.player.cursor.pos.y + self.player.pos.y]
-                                }
+                        "data": self.player.data
                       }
         
         if self.player.id != -1:
