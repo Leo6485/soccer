@@ -16,7 +16,7 @@ class Server:
         data = json.loads(data)
 
         route = data.get("type", None).upper()
-        print(f"\033[1;34mDados recebidos: \033[1;32m{data}\n\033[1;34mRota: \033[1;32m{route}\033[0m")
+        # print(f"\033[1;34mDados recebidos: \033[1;32m{data}\n\033[1;34mRota: \033[1;32m{route}\033[0m")
 
         return data, route
 

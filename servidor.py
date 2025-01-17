@@ -22,8 +22,7 @@ class Game:
         self.clients = []
 
     def update(self):
-        print(self.players)
-        for player in self.players.values():
+        for id, player in self.players.items():
             d, distancia = self.ball.calc_dist(player["pos"])
 
             if distancia == 0:
@@ -38,7 +37,7 @@ class Game:
             att_ts = player.get("attack_ts", 0)
             
             if time() - att_ts < 0.5:
-                print(f"Player atacou {int(time())}")
+                print(f"Player atacou {id} na posição {player['cursor_pos']}")
 
 
         self.ball.pos[0] += self.ball.vel[0]

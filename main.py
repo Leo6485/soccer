@@ -157,7 +157,7 @@ class Game:
                                     "pos": list(self.player.pos),
                                     "id": self.player.id,
                                     "attack_ts": self.player.attack_ts, 
-                                    "cursor_pos": list(self.player.cursor.pos)
+                                    "cursor_pos": [self.player.cursor.pos.x + self.player.pos.x, self.player.cursor.pos.y + self.player.pos.y]
                                 }
                       }
         
@@ -197,7 +197,7 @@ game = Game(app)
 @app.route("update")
 def update(data, addr):
     game.ball.pos = data["ball"]
-    for player in data["players"]:
+    for player in data["players"].values():
         id = player["id"]
         if id != game.player.id:
             if id in game.players.keys():
