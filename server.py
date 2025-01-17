@@ -16,7 +16,7 @@ class Server:
         data = json.loads(data)
 
         route = data.get("type", None).upper()
-        # print(f"\033[1;34mDados recebidos: \033[1;32m{data}\n\033[1;34mRota: \033[1;32m{route}\033[0m")
+        print(f"\033[1;34mDados recebidos: \033[1;32m{data}\n\033[1;34mRota: \033[1;32m{route}\033[0m")
 
         return data, route
 
@@ -95,7 +95,11 @@ class Client(Server):
         print("\033c", end="\r")
         self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server.settimeout(0.5)
+        self.server_ip = server_ip
         self.ip = self.get_ip()
         self.port = port
         self.routes = {}
         print(f"[ * ] Vinculado como: {self.ip}:{self.port}")
+
+    def send(self, data):
+        self.server.sendto(data.encode(), (self.server_ip, self.port))

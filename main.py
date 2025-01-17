@@ -12,7 +12,7 @@ def draw_grid(surface, color, cell_size):
         pg.draw.line(surface, color, (0, y), (width, y), width=4)
 
 pg.init()
-pg.mouse.set_visible(1)
+pg.mouse.set_visible(0)
 d = pg.display.Info()
 DW, DH = d.current_w, d.current_h
 del d
@@ -127,7 +127,7 @@ class Game:
         self.players = {}
 
         data = {"type": "CONNECT", "data": {}}
-        self.app.send(json.dumps(data), ("172.18.1.92", 5454))
+        self.app.send(json.dumps(data))
 
         self.ball = Ball()
 
@@ -147,6 +147,9 @@ class Game:
             self.running = False
 
         self.player.update(pressed, mouse_pressed, self.ball)
+        self.send_updates()
+
+    def send_updates(self):
         
         player_data = {
                         "type": "update",
@@ -157,8 +160,9 @@ class Game:
                                     "cursor_pos": list(self.player.cursor.pos)
                                 }
                       }
-
-        self.app.send(json.dumps(player_data), ("172.18.1.92", 5454))
+        
+        if self.player.id != -1:
+            self.app.send(json.dumps(player_data))
 
     def draw(self):
         self.screen.fill(BG_COLOR)
@@ -181,7 +185,7 @@ class Game:
             self.draw()
             clock.tick(60)
 
-app = Client()
+app = Client(server_ip="192.168.0.109")
 app.run(wait=False)
 
 @app.route("id")
