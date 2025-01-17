@@ -4,7 +4,7 @@ from time import sleep
 from os import _exit
 from time import time
 
-from server import Server
+from net import Server
 
 class Ball:
     def __init__(self):

@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 import json
+
 class Server:
     def __init__(self, ip=None, port=5454):
         print("\033c", end="\r")
