@@ -17,12 +17,13 @@ class Ball:
 
 class Game:
     def __init__(self):
-        self.players = []
+        self.players = {}
         self.ball = Ball()
         self.clients = []
 
     def update(self):
-        for player in self.players:
+        print(self.players)
+        for player in self.players.values():
             d, distancia = self.ball.calc_dist(player["pos"])
 
             if distancia == 0:
@@ -35,6 +36,7 @@ class Game:
                 self.ball.vel[1] -= d[1]
             
             att_ts = player.get("attack_ts", 0)
+            
             if time() - att_ts < 0.5:
                 print(f"Player atacou {int(time())}")
 
@@ -52,20 +54,20 @@ game = Game()
 def connect(data, addr):
     player_id = len(game.players)
     player_data = {"addr": addr, "pos": [0, 0], "id": player_id, "attack_ts": 0}
-    game.players.append(player_data)
+    game.players[player_id] = player_data
     game.clients.append(addr)
 
     print(f"Novo jogador conectado: {data}")
-    
+    print(game.players)
     return json.dumps({"type": "ID", "data": {"id": player_id}})
 
 @app.route("UPDATE")
 def update(data, addr):
-    for player in game.players:
-        if player["id"] == data["id"]:
-            player["pos"] = data["pos"]
-            player["attack_ts"] = data["attack_ts"]
-            player["cursor_pos"] = data["cursor_pos"]
+    id = data["id"]
+    player = game.players[id]
+    player["pos"] = data["pos"]
+    player["attack_ts"] = data["attack_ts"]
+    player["cursor_pos"] = data["cursor_pos"]
 
 @app.route("QUIT")
 def quit(data, addr):
