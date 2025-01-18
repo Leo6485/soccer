@@ -50,19 +50,19 @@ class Game:
                 print(f"Player atacou {id} na posição {player['cursor_pos']}")
         
         if self.ball.pos[0] < self.ball.size:
-            self.ball.vel[0] *= -1
+            self.ball.vel[0] *= -0.5
             self.ball.pos[0] = self.ball.size
         
         if self.ball.pos[1] < self.ball.size:
-            self.ball.vel[1] *= -1
+            self.ball.vel[1] *= -0.5
             self.ball.pos[1] = self.ball.size
 
         if self.ball.pos[0] > self.display.x - self.ball.size:
-            self.ball.vel[0] *= -1
+            self.ball.vel[0] *= -0.5
             self.ball.pos[0] = self.display.x - self.ball.size
 
         if self.ball.pos[1] > self.display.y - self.ball.size:
-            self.ball.vel[1] *= -1
+            self.ball.vel[1] *= -0.5
             self.ball.pos[1] = self.display.y - self.ball.size
 
         self.ball.pos[0] += self.ball.vel[0]
