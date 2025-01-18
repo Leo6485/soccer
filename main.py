@@ -2,6 +2,7 @@ import pygame as pg
 from time import time
 from math import sqrt
 import json
+import jsonbin
 from net import Client
 from entity import *
 
@@ -84,7 +85,8 @@ class Game:
             self.draw()
             clock.tick(60)
 
-app = Client(server_ip="192.168.0.109")
+server_ip = jsonbin.get_ip()
+app = Client(server_ip=server_ip)
 app.run(wait=False)
 game = Game(app)
 
@@ -102,7 +104,6 @@ def update(data, addr):
             if id in game.players.keys():
                 game.players[id].pos = player["pos"]
             else:
-                print("OK", id)
                 game.players[id] = Enemy(player["id"])
                 game.players[id].pos = player["pos"]
 

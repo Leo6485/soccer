@@ -101,6 +101,7 @@ class Client(Server):
         self.port = port
         self.routes = {}
         print(f"[ * ] Vinculado como: {self.ip}:{self.port}")
+        print(f"Conectado com: {self.server_ip}")
 
     def send(self, data):
         self.server.sendto(data.encode(), (self.server_ip, self.port))

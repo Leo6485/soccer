@@ -35,7 +35,6 @@ class Cursor:
                 self.delta.y = 0
 
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
-        print(self.last_cursor_pos.x)
         if not (DW/8 < self.last_cursor_pos.x < 7 * DW/8) or not (DH/8 < self.last_cursor_pos.y < 7 * DH/8):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
@@ -67,14 +66,14 @@ class Player:
         
         if coll[1] < 105:
             if coll[1] != 0:
-                nx = coll[0][0] / coll[1]
-                ny = coll[0][1] / coll[1]
+                normal_x = coll[0][0] / coll[1]
+                normal_y = coll[0][1] / coll[1]
             else:
-                nx, ny = 1, 0
-            d = 105 - coll[1]
+                normal_x, normal_y = 1, 0
+            overlap = 105 - coll[1]
 
-            self.pos.x += nx * d
-            self.pos.y += ny * d
+            self.pos.x += normal_x * overlap
+            self.pos.y += normal_y * overlap
         
         if pressed[pg.K_a]:
             self.attack_ts = time()
@@ -85,7 +84,7 @@ class Player:
         self.data =  {
                         "pos": list(self.pos),
                         "id": self.id,
-                        "attack_ts": self.attack_ts, 
+                        "attack_ts": self.attack_ts,
                         "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y]
                      }
     def draw(self, screen):

@@ -3,7 +3,7 @@ from math import sqrt
 from time import sleep
 from os import _exit
 from time import time
-
+import jsonbin
 from net import Server
 
 class Ball:
@@ -15,11 +15,17 @@ class Ball:
         d = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
         return d, sqrt(d[0]**2 + d[1]**2)
 
+class Vector2:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
 class Game:
     def __init__(self):
         self.players = {}
         self.ball = Ball()
         self.clients = []
+        self.display = Vector2(1200, 720)
 
     def update(self):
         for id, player in self.players.items():
@@ -50,6 +56,7 @@ class Game:
         self.ball.vel[1] *= 0.98
 
 app = Server()
+jsonbin.set_ip(app.ip)
 game = Game()
 
 @app.route("CONNECT")
