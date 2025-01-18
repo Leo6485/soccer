@@ -10,6 +10,7 @@ class Ball:
     def __init__(self):
         self.pos = [500, 500]
         self.vel = [0, 0]
+        self.size = 85
     
     def calc_dist(self, pos):
         d = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
@@ -47,7 +48,22 @@ class Game:
             if time() - att_ts < 0.5 and att_ts - last_att > 1:
                 player["last_attack"] = time()
                 print(f"Player atacou {id} na posição {player['cursor_pos']}")
+        
+        if self.ball.pos[0] < self.ball.size:
+            self.ball.vel[0] *= -1
+            self.ball.pos[0] = self.ball.size
+        
+        if self.ball.pos[1] < self.ball.size:
+            self.ball.vel[1] *= -1
+            self.ball.pos[1] = self.ball.size
 
+        if self.ball.pos[0] > self.display.x - self.ball.size:
+            self.ball.vel[0] *= -1
+            self.ball.pos[0] = self.display.x - self.ball.size
+
+        if self.ball.pos[1] > self.display.y - self.ball.size:
+            self.ball.vel[1] *= -1
+            self.ball.pos[1] = self.display.y - self.ball.size
 
         self.ball.pos[0] += self.ball.vel[0]
         self.ball.pos[1] += self.ball.vel[1]
