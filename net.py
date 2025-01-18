@@ -6,7 +6,7 @@ class Server:
     def __init__(self, ip=None, port=5454):
         print("\033c", end="\r")
         self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.ip = self.get_ip()
+        self.ip = self.get_ip() if not ip else ip
         self.port = port
         self.server.bind((self.ip, port))
         self.routes = {}

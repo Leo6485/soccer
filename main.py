@@ -4,7 +4,8 @@ from math import sqrt
 import json
 import jsonbin
 from net import Client
-from entity import *
+from modules.entity import *
+from modules.player import Player
 
 def draw_grid(surface, color, cell_size):
     width, height = surface.get_size()

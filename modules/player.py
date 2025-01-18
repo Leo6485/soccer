@@ -59,11 +59,13 @@ class Player:
     def update(self, pressed, mouse_pressed, ball):
         self.cursor.update()
         run = pressed[pg.K_w]
-        coll = ball.calc_dist(self.pos)
         if run:
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
         
+        ########## Reage com a bola ##########
+        coll = ball.calc_dist(self.pos)
+
         if coll[1] < 105:
             if coll[1] != 0:
                 normal_x = coll[0][0] / coll[1]
@@ -75,6 +77,7 @@ class Player:
             self.pos.x += normal_x * overlap
             self.pos.y += normal_y * overlap
         
+        ########## Ataca ##########
         if pressed[pg.K_a]:
             self.attack_ts = time()
         
@@ -87,29 +90,9 @@ class Player:
                         "attack_ts": self.attack_ts,
                         "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y]
                      }
+
     def draw(self, screen):
         pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 5)
         pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)
-
-class Enemy:
-    def __init__(self, id):
-        self.id = id
-        self.size = 25
-        self.pos = pg.Vector2(0, 0)
-    
-    def draw(self, screen):
-        pg.draw.circle(screen, (255, 0, 0), (int(self.pos[0]), int(self.pos[1])), self.size)
-
-class Ball:
-    def __init__(self):
-        self.size = 80
-        self.pos = (DW/2, DH/2)
-
-    def draw(self, screen):        
-        pg.draw.circle(screen, (150, 150, 150), self.pos, self.size)
-
-    def calc_dist(self, pos):
-        d = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
-        return d, sqrt(d[0]**2 + d[1]**2)
