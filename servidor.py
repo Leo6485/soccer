@@ -62,6 +62,8 @@ class Game:
                         self.players[id]["force_pos"] = time()
 
                 player["last_attack"] = time()
+            
+            att_ts, last_att, target, cursor = 0, 0, 0, 0
 
         if self.ball.pos[0] < self.ball.size:
             self.ball.vel[0] *= -0.5
@@ -104,9 +106,11 @@ def connect(data, addr):
 def update(data, addr):
     id = data["id"]
     player = game.players[id]
-    player["pos"] = data["pos"]
-    player["attack_ts"] = data["attack_ts"]
-    player["cursor_pos"] = data["cursor_pos"]
+    
+    if time() - game.players[id].get("force_pos", 0) < 0.5:
+        player["pos"] = data["pos"]
+        player["attack_ts"] = data["attack_ts"]
+        player["cursor_pos"] = data["cursor_pos"]
 
 @app.route("QUIT")
 def quit(data, addr):

@@ -27,7 +27,7 @@ BACKGROUND_COLOR = (0, 0, 0)
 
 class Game:
     def __init__(self, app):
-        self.screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((1200, 720))
         self.app = app
         self.player = Player(-1)
         self.players = {}
