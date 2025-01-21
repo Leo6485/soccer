@@ -76,6 +76,11 @@ class Game:
         self.player.draw(self.screen)
 
         self.ball.draw(self.screen)
+        
+        if self.ball.calc_dist(self.player.pos)[1] < 110:
+            pg.draw.line(self.screen, (0, 255, 255), self.player.pos, (self.player.pos.x, self.ball.pos[1]), width=2)
+            pg.draw.line(self.screen, (0, 255, 255), (self.player.pos.x, self.ball.pos[1]), self.ball.pos, width=2)
+            pg.draw.line(self.screen, (0, 255, 255), self.player.pos, self.ball.pos, width=2)
 
         pg.display.flip()
 
