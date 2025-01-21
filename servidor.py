@@ -92,7 +92,7 @@ game = Game()
 @app.route("CONNECT")
 def connect(data, addr):
     player_id = len(game.players)
-    player_data = {"addr": addr, "pos": [0, 0], "id": player_id, "attack_ts": 0, "last_attack": 0}
+    player_data = {"addr": addr, "pos": [0, 0], "name": data["name"], "id": player_id, "attack_ts": 0, "last_attack": 0}
     game.players[player_id] = player_data
     game.clients.append(addr)
 

@@ -29,10 +29,10 @@ class Game:
     def __init__(self, app):
         self.screen = pg.display.set_mode((1200, 720))
         self.app = app
-        self.player = Player(-1)
+        self.player = Player(-1, input("Insira seu nome: "))
         self.players = {}
 
-        data = {"type": "CONNECT", "data": {}}
+        data = {"type": "CONNECT", "data": {"name": self.player.name}}
         self.app.send(json.dumps(data))
 
         self.ball = Ball()
@@ -105,7 +105,7 @@ def update(data, addr):
             if id in game.players.keys():
                 game.players[id].pos = player["pos"]
             else:
-                game.players[id] = Enemy(player["id"])
+                game.players[id] = Enemy(player["id"], player["name"])
                 game.players[id].pos = player["pos"]
         
         elif time() - player.get("force_pos", 0) < 0.5:

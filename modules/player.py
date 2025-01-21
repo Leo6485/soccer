@@ -43,14 +43,14 @@ class Cursor:
 class Player:
     vel = 0.05
 
-    def __init__(self, id):
+    def __init__(self, id, name):
         self.pos = pg.Vector2(100, 100)
         self.size = 25
         self.life = 100
         self.attack_ts = 0
         self.last_attack = 0
         self.cursor = Cursor()
-        self.name = "Osvaldo"
+        self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
         self.id = id
         self.team = self.id % 2 + 1
