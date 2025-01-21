@@ -77,6 +77,12 @@ class Game:
 
         self.ball.draw(self.screen)
         
+        for player in self.players.values():
+            if player.id != self.player.id and self.ball.calc_dist(player.pos)[1] < 110:
+                pg.draw.line(self.screen, (0, 255, 255), player.pos, (player.pos[0], self.ball.pos[1]), width=2)
+                pg.draw.line(self.screen, (0, 255, 255), (player.pos[0], self.ball.pos[1]), self.ball.pos, width=2)
+                pg.draw.line(self.screen, (0, 255, 255), player.pos, self.ball.pos, width=2)
+
         if self.ball.calc_dist(self.player.pos)[1] < 110:
             pg.draw.line(self.screen, (0, 255, 255), self.player.pos, (self.player.pos.x, self.ball.pos[1]), width=2)
             pg.draw.line(self.screen, (0, 255, 255), (self.player.pos.x, self.ball.pos[1]), self.ball.pos, width=2)
