@@ -34,8 +34,9 @@ class Cursor:
                 self.delta.x = 0
                 self.delta.y = 0
 
+        cr = 5
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
-        if not (DW/8 < self.last_cursor_pos.x < 7 * DW/8) or not (DH/8 < self.last_cursor_pos.y < 7 * DH/8):
+        if not (DW/cr < self.last_cursor_pos.x < cr-1 * DW/cr) or not (DH/cr < self.last_cursor_pos.y < cr-1 * DH/cr):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
 

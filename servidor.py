@@ -57,13 +57,11 @@ class Game:
                     if distancia < 50:
                         print(f"Player {id} atacou player {target_player['id']}")
                         id = target_player["id"]
-                        pos = [50, 250] if id%2 else [1150, 250]
+                        pos = [50, 360] if id%2 else [1150, 360]
                         self.players[id]["pos"] = pos
                         self.players[id]["force_pos"] = time()
 
                 player["last_attack"] = time()
-            
-            att_ts, last_att, target, cursor = 0, 0, 0, 0
 
         if self.ball.pos[0] < self.ball.size:
             self.ball.vel[0] *= -0.5
@@ -107,7 +105,7 @@ def update(data, addr):
     id = data["id"]
     player = game.players[id]
     
-    if time() - game.players[id].get("force_pos", 0) < 0.5:
+    if time() - game.players[id].get("force_pos", 0) > 0.5:
         player["pos"] = data["pos"]
         player["attack_ts"] = data["attack_ts"]
         player["cursor_pos"] = data["cursor_pos"]
