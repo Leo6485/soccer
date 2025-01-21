@@ -61,7 +61,7 @@ class Game:
                         "type": "update",
                         "data": self.player.data
                       }
-        
+
         if self.player.id != -1:
             self.app.send(json.dumps(player_data))
 
@@ -107,6 +107,9 @@ def update(data, addr):
             else:
                 game.players[id] = Enemy(player["id"])
                 game.players[id].pos = player["pos"]
+        
+        elif time() - player.get("force_pos", 0) < 0.5:
+            game.player.pos = pg.Vector2(player["pos"])
 
 game.run()
 pg.quit()
