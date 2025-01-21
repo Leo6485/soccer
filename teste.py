@@ -24,4 +24,4 @@ for i in range(100):
     if not ok:
         os._exit(0)
     
-    sleep(1)
+    sleep(2)

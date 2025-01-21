@@ -54,7 +54,6 @@ class Game:
                     target = target_player["pos"]
                     cursor = player["cursor_pos"]
                     distancia = sqrt((target[0] - cursor[0])**2 + (target[1] - cursor[1])**2)
-
                     if distancia < 50:
                         # Player 0:1 atacou player 1 
                         print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
