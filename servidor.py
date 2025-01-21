@@ -46,8 +46,9 @@ class Game:
 
             # Delay aceito e cooldown
             if time() - att_ts < 0.5 and att_ts - last_att > 1:
+                print(player)
                 for target_player in self.players.values():
-                    if target_player["id"] == id:
+                    if target_player["id"] == player["id"]:
                         continue
                     
                     target = target_player["pos"]
@@ -55,7 +56,8 @@ class Game:
                     distancia = sqrt((target[0] - cursor[0])**2 + (target[1] - cursor[1])**2)
 
                     if distancia < 50:
-                        print(f"Player {id} atacou player {target_player['id']}")
+                        # Player 0:1 atacou player 1 
+                        print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
                         id = target_player["id"]
                         pos = [50, 360] if id%2 else [1150, 360]
                         self.players[id]["pos"] = pos
