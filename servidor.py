@@ -27,7 +27,6 @@ class Game:
         self.ball = Ball()
         self.clients = []
         self.display = Vector2(1366, 768)
-        self.placar = [0, 0]
 
     def update(self):
         for id, player in self.players.items():
@@ -84,19 +83,17 @@ class Game:
             self.ball.vel[1] *= -0.5
             self.ball.pos[1] = self.display.y - self.ball.size
 
-        ############################## Colisão da bola com os gols ##############################
+        ############################## Detecção dos gols ##############################
         
         if self.ball.pos[0] < 150 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
             self.ball.pos = [683, 382]
             self.ball.vel = [0, 0]
-            print("Gol do time 2")
-            self.placar[1] += 1
+            print("Gol do time 2!")
         
         if self.ball.pos[0] > 1216 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
             self.ball.pos = [683, 382]
             self.ball.vel = [0, 0]
-            print("Gol do time 1")
-            self.placar[0] += 1
+            print("Gol do time 1!")
 
         self.ball.pos[0] += self.ball.vel[0]
         self.ball.pos[1] += self.ball.vel[1]
