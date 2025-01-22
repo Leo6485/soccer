@@ -26,10 +26,12 @@ class Game:
         self.players = {}
         self.ball = Ball()
         self.clients = []
-        self.display = Vector2(1200, 720)
+        self.display = Vector2(1366, 768)
 
     def update(self):
         for id, player in self.players.items():
+            
+            ############################## Interação da bola com os jogadores ##############################
             d, distancia = self.ball.calc_dist(player["pos"])
 
             if distancia == 0:
@@ -37,10 +39,12 @@ class Game:
 
             d[0] = (d[0]) / (distancia * 20)
             d[1] = (d[1]) / (distancia * 20)
+
             if distancia < 110:
                 self.ball.vel[0] -= d[0]
                 self.ball.vel[1] -= d[1]
             
+            ############################## Ataque ##############################
             att_ts = player.get("attack_ts", 0)
             last_att = player.get("last_attack", 0)
             attack_target = player.get("attack_target", None)
@@ -54,15 +58,15 @@ class Game:
                     cursor = player["cursor_pos"]
                     distancia = sqrt((target[0] - cursor[0])**2 + (target[1] - cursor[1])**2)
                     if distancia < 50:
-                        # Player 0:1 atacou player 1 
                         print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
                         id = target_player["id"]
-                        pos = [50, 360] if id%2 else [1150, 360]
+                        pos = [50, 384] if not id%2 else [1316, 384]
                         self.players[id]["pos"] = pos
                         self.players[id]["force_pos"] = time()
 
                 player["last_attack"] = time()
-
+        
+        ############################## Colisão da bola com o mapa ##############################
         if self.ball.pos[0] < self.ball.size:
             self.ball.vel[0] *= -0.5
             self.ball.pos[0] = self.ball.size
@@ -78,6 +82,18 @@ class Game:
         if self.ball.pos[1] > self.display.y - self.ball.size:
             self.ball.vel[1] *= -0.5
             self.ball.pos[1] = self.display.y - self.ball.size
+
+        ############################## Colisão da bola com os gols ##############################
+        
+        if self.ball.pos[0] < 150 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
+            self.ball.pos = [683, 382]
+            self.ball.vel = [0, 0]
+            print("Gol do time 2!")
+        
+        if self.ball.pos[0] > 1216 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
+            self.ball.pos = [683, 382]
+            self.ball.vel = [0, 0]
+            print("Gol do time 1!")
 
         self.ball.pos[0] += self.ball.vel[0]
         self.ball.pos[1] += self.ball.vel[1]
@@ -128,7 +144,7 @@ app.run(wait=False)
 
 def send_updates():
     for c in game.clients:
-        app.send(json.dumps({"type": "UPDATE", "data": {"ball": game.ball.pos, "players": game.players}}), c)
+        app.send(json.dumps({"type": "UPDATE", "data": {"ball": [round(i, 2) for i in game.ball.pos], "players": game.players}}), c)
 
 while True:
     try:

@@ -25,9 +25,10 @@ GRID_COLOR = (0, 0, 0)
 BG_COLOR = (20, 20, 20)
 BACKGROUND_COLOR = (0, 0, 0)
 
+
 class Game:
     def __init__(self, app):
-        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((1366, 768), pg.FULLSCREEN)
         self.app = app
         self.player = Player(-1, input("Insira seu nome: "))
         self.players = {}
@@ -69,7 +70,10 @@ class Game:
         self.screen.fill(BG_COLOR)
 
         draw_grid(self.screen, GRID_COLOR, 40)
-
+        
+        pg.draw.rect(self.screen, (255, 255, 255), (0, 200, 150, 368), width=4)
+        pg.draw.rect(self.screen, (255, 255, 255), (1216, 200, 150, 368), width=4)
+        
         for id, enemy in self.players.items():
             if id != self.player.id:
                 enemy.draw(self.screen)
@@ -87,8 +91,16 @@ class Game:
             pg.draw.line(self.screen, (0, 255, 255), self.player.pos, (self.player.pos.x, self.ball.pos[1]), width=2)
             pg.draw.line(self.screen, (0, 255, 255), (self.player.pos.x, self.ball.pos[1]), self.ball.pos, width=2)
             pg.draw.line(self.screen, (0, 255, 255), self.player.pos, self.ball.pos, width=2)
-
+        
+        self.debug(f"Player: {self.player.pos}", 0)
+        self.debug(f"Ball: {self.ball.pos}", 1)
         pg.display.flip()
+    
+    def debug(self, text, offset):
+        font = pg.font.Font(None, 15)
+        text = font.render(text, True, (255, 0, 0))
+        text_rect = text.get_rect(topleft=(10, 25*offset))
+        self.screen.blit(text, text_rect)
 
     def run(self):
         clock = pg.time.Clock()
