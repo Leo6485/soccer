@@ -34,9 +34,9 @@ class Cursor:
                 self.delta.x = 0
                 self.delta.y = 0
 
-        cr = 5
+        cr = 10
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
-        if not (DW/cr < self.last_cursor_pos.x < cr-1 * DW/cr) or not (DH/cr < self.last_cursor_pos.y < cr-1 * DH/cr):
+        if not (DW/cr < self.last_cursor_pos.x < (cr-1) * DW/cr) or not (DH/cr < self.last_cursor_pos.y < (cr-1) * DH/cr):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
 
@@ -49,15 +49,15 @@ class Player:
         self.life = 100
         self.attack_ts = 0
         self.last_attack = 0
+        self.attack_target = None
         self.cursor = Cursor()
         self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
         self.id = id
         self.team = self.id % 2 + 1
-        self.current_frame = 0
         self.data = {"pos": [0, 0], "id": id}
 
-    def update(self, pressed, mouse_pressed, ball):
+    def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
         run = pressed[pg.K_w]
         if run:
@@ -80,7 +80,25 @@ class Player:
         
         ########## Ataca ##########
         if pressed[pg.K_a]:
-            self.attack_ts = time()
+            if time() - self.last_attack > 1:
+                self.attack_target = None
+                
+                ########## Verifica se o cursor está em cima de um player ##########
+                for player in players.values():
+                    if player.id == self.id:
+                        continue
+
+                    target = player.pos
+                    cursor = pg.Vector2(self.pos.x + self.cursor.pos.x, self.pos.y + self.cursor.pos.y)
+                    distance = sqrt((target[0] - cursor.x)**2 + (target[1] - cursor.y)**2)
+                    
+                    print(distance)
+                    if distance < 50:
+                        self.attack_target = player.id
+
+                self.attack_ts = time()
+                self.last_attack = time()
+
         
         self.update_data()
 
@@ -89,7 +107,8 @@ class Player:
                         "pos": list(self.pos),
                         "id": self.id,
                         "attack_ts": self.attack_ts,
-                        "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y]
+                        "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y],
+                        "attack_target": self.attack_target,
                      }
 
     def draw(self, screen):

@@ -52,7 +52,7 @@ class Game:
         if pressed[pg.K_q]:
             self.running = False
 
-        self.player.update(pressed, mouse_pressed, self.ball)
+        self.player.update(pressed, mouse_pressed, self.ball, self.players)
         self.send_updates()
 
     def send_updates(self):

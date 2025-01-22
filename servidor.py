@@ -43,14 +43,13 @@ class Game:
             
             att_ts = player.get("attack_ts", 0)
             last_att = player.get("last_attack", 0)
+            attack_target = player.get("attack_target", None)
 
             # Delay aceito e cooldown
             if time() - att_ts < 0.5 and att_ts - last_att > 1:
                 print(player)
-                for target_player in self.players.values():
-                    if target_player["id"] == player["id"]:
-                        continue
-                    
+                if attack_target is not None:
+                    target_player = self.players[attack_target]
                     target = target_player["pos"]
                     cursor = player["cursor_pos"]
                     distancia = sqrt((target[0] - cursor[0])**2 + (target[1] - cursor[1])**2)
@@ -98,7 +97,7 @@ def connect(data, addr):
     game.clients.append(addr)
 
     print(f"Novo jogador conectado: {data}")
-    print(game.players)
+
     return json.dumps({"type": "ID", "data": {"id": player_id}})
 
 @app.route("UPDATE")
@@ -110,6 +109,7 @@ def update(data, addr):
         player["pos"] = data["pos"]
         player["attack_ts"] = data["attack_ts"]
         player["cursor_pos"] = data["cursor_pos"]
+        player["attack_target"] = data["attack_target"]
 
 @app.route("QUIT")
 def quit(data, addr):
