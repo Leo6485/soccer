@@ -35,6 +35,8 @@ class Server:
             Thread(target=go_route, args=(data, addr)).start()
         except KeyboardInterrupt:
             self.stop()
+        except socket.timeout:
+            pass
         except Exception as e:
             print(e)
 
