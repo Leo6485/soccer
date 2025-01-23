@@ -29,7 +29,7 @@ name = input("Insira seu nome: ")
 
 class Game:
     def __init__(self, app, name):
-        self.screen = pg.display.set_mode((1366, 768), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
         self.app = app
         self.placar = [0, 0]
 

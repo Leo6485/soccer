@@ -60,7 +60,7 @@ class Player:
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
-        run = pressed[pg.K_w] and (time() - self.respawn_ts > 0.5)
+        run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5)
         if run:
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
