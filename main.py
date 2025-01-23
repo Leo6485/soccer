@@ -25,14 +25,15 @@ GRID_COLOR = (0, 0, 0)
 BG_COLOR = (20, 20, 20)
 BACKGROUND_COLOR = (0, 0, 0)
 
+name = input("Insira seunome: ")
 
 class Game:
-    def __init__(self, app):
+    def __init__(self, app, name):
         self.screen = pg.display.set_mode((1366, 768), pg.FULLSCREEN)
         self.app = app
         self.placar = [0, 0]
 
-        self.player = Player(-1, input("Insira seu nome: "))
+        self.player = Player(-1, name)
         self.players = {}
 
         data = {"type": "CONNECT", "data": {"name": self.player.name}}
@@ -115,7 +116,7 @@ class Game:
 server_ip = jsonbin.get_ip()
 app = Client(server_ip=server_ip)
 app.run(wait=False)
-game = Game(app)
+game = Game(app, name)
 
 @app.route("id")
 def id(data, addr):
