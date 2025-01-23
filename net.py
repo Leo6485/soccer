@@ -46,7 +46,7 @@ class Server:
             self.routes[key] = f
             return None
         return wrap0
-    
+
     def send(self, data, addr):
         self.server.sendto(data.encode(), addr)
 
