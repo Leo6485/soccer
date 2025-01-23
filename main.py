@@ -44,6 +44,12 @@ class Game:
         self.scale = min(DW / 1920, DH / 1080)
         self.padding = ((DW - 1920 * self.scale) / 2, (DH - 1080 * self.scale) / 2)
         self.running = True
+        
+        # Debug
+        
+        self.debug_font = pg.font.Font(None, 15)
+        self.last_pkg = 0
+        self.pkgs = 1
 
     def update(self):
         for e in pg.event.get():
@@ -84,34 +90,25 @@ class Game:
 
         self.ball.draw(self.screen)
         
-        for player in self.players.values():
-            if player.id != self.player.id and self.ball.calc_dist(player.pos)[1] < 110:
-                pg.draw.line(self.screen, (0, 255, 255), player.pos, (player.pos[0], self.ball.pos[1]), width=2)
-                pg.draw.line(self.screen, (0, 255, 255), (player.pos[0], self.ball.pos[1]), self.ball.pos, width=2)
-                pg.draw.line(self.screen, (0, 255, 255), player.pos, self.ball.pos, width=2)
-
-        if self.ball.calc_dist(self.player.pos)[1] < 110:
-            pg.draw.line(self.screen, (0, 255, 255), self.player.pos, (self.player.pos.x, self.ball.pos[1]), width=2)
-            pg.draw.line(self.screen, (0, 255, 255), (self.player.pos.x, self.ball.pos[1]), self.ball.pos, width=2)
-            pg.draw.line(self.screen, (0, 255, 255), self.player.pos, self.ball.pos, width=2)
-        
+        # Debug
         self.debug(f"Player: {self.player.pos}", 0)
         self.debug(f"Ball: {self.ball.pos}", 1)
         self.debug(f"Placar: {self.placar}", 2)
+        self.debug(f"FPS: {self.clock.get_fps():.2f}", 3)
+        self.debug(f"PKG/s: {self.pkgs:.2f}", 4)
         pg.display.flip()
     
     def debug(self, text, offset):
-        font = pg.font.Font(None, 15)
-        text = font.render(text, True, (255, 0, 0))
+        text = self.debug_font.render(text, True, (255, 0, 0))
         text_rect = text.get_rect(topleft=(10, 25*offset))
         self.screen.blit(text, text_rect)
 
     def run(self):
-        clock = pg.time.Clock()
+        self.clock = pg.time.Clock()
         while self.running:
             self.update()
             self.draw()
-            clock.tick(60)
+            self.clock.tick(60)
 
 server_ip = jsonbin.get_ip()
 app = Client(server_ip=server_ip)
@@ -141,6 +138,14 @@ def update(data, addr):
                 game.player.pos = pg.Vector2(player["pos"])
     
     game.placar = data["placar"]
+
+    # Debug
+    t = time()
+    d = (t - game.last_pkg)
+    game.pkgs = 1.0/ d if d else 1
+    game.last_pkg = t
+    game.last_pkg = time()
+    ##############################
 
 game.run()
 pg.quit()

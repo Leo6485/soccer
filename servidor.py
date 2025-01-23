@@ -76,7 +76,6 @@ class Game:
 
             # Delay aceito e cooldown
             if time() - att_ts < 0.5 and att_ts - last_att > 0.5:
-                print(player)
                 if attack_target is not None:
                     target_player = self.players[attack_target]
                     target = target_player["pos"]
@@ -86,7 +85,7 @@ class Game:
                         print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
                         id = target_player["id"]
                         pos = respawn_points[id]
-                        self.players[id]["pos"] = pos
+                        self.players[id]["pos"] = pos   
                         self.players[id]["respawn_ts"] = time()
 
                 player["last_attack"] = time()
