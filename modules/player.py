@@ -81,7 +81,7 @@ class Player:
         
         ########## Ataca ##########
         if pressed[pg.K_a]:
-            if time() - self.last_attack > 1:
+            if time() - self.last_attack > 0.5:
                 self.attack_target = None
                 
                 ########## Verifica se o cursor está em cima de um player ##########
