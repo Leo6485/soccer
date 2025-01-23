@@ -23,7 +23,7 @@ class Server:
 
     def listen(self):
         try:
-            data, addr = self.server.recvfrom(1024)
+            data, addr = self.server.recvfrom(2048)
             def go_route(data, addr):
                 data, route = self.parse(data)
 
@@ -36,7 +36,7 @@ class Server:
         except KeyboardInterrupt:
             self.stop()
         except Exception as e:
-            pass
+            print(e)
 
     def route(self, key):
         key = key.upper()

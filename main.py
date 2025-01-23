@@ -30,6 +30,8 @@ class Game:
     def __init__(self, app):
         self.screen = pg.display.set_mode((1366, 768), pg.FULLSCREEN)
         self.app = app
+        self.placar = [0, 0]
+
         self.player = Player(-1, input("Insira seu nome: "))
         self.players = {}
 
@@ -94,6 +96,7 @@ class Game:
         
         self.debug(f"Player: {self.player.pos}", 0)
         self.debug(f"Ball: {self.ball.pos}", 1)
+        self.debug(f"Placar: {self.placar}", 2)
         pg.display.flip()
     
     def debug(self, text, offset):
@@ -131,8 +134,12 @@ def update(data, addr):
                 game.players[id] = Enemy(player["id"], player["name"])
                 game.players[id].pos = player["pos"]
         
-        elif time() - player.get("force_pos", 0) < 0.5:
-            game.player.pos = pg.Vector2(player["pos"])
+        else:
+            game.player.respawn_ts = player.get("respawn_ts")
+            if time() - player.get("respawn_ts", 0) < 0.5:
+                game.player.pos = pg.Vector2(player["pos"])
+    
+    game.placar = data["placar"]
 
 game.run()
 pg.quit()

@@ -50,6 +50,7 @@ class Player:
         self.attack_ts = 0
         self.last_attack = 0
         self.attack_target = None
+        self.respawn_ts = 0
         self.cursor = Cursor()
         self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
@@ -59,7 +60,7 @@ class Player:
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
-        run = pressed[pg.K_w]
+        run = pressed[pg.K_w] and (time() - self.respawn_ts > 0.5)
         if run:
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
@@ -91,8 +92,7 @@ class Player:
                     target = player.pos
                     cursor = pg.Vector2(self.pos.x + self.cursor.pos.x, self.pos.y + self.cursor.pos.y)
                     distance = sqrt((target[0] - cursor.x)**2 + (target[1] - cursor.y)**2)
-                    
-                    print(distance)
+
                     if distance < 50:
                         self.attack_target = player.id
 
