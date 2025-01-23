@@ -75,7 +75,7 @@ class Game:
             attack_target = player.get("attack_target", None)
 
             # Delay aceito e cooldown
-            if time() - att_ts < 0.5 and att_ts - last_att > 1:
+            if time() - att_ts < 0.5 and att_ts - last_att > 0.5:
                 print(player)
                 if attack_target is not None:
                     target_player = self.players[attack_target]
@@ -109,7 +109,7 @@ class Game:
         # print(self.players)
         if gol:
             for player in self.players.values():
-                player["attack_ts"] = ts
+                player["respawn_ts"] = ts
                 player["pos"] = respawn_points[player["id"]]
 
         self.ball.pos[0] += self.ball.vel[0]
