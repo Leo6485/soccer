@@ -93,16 +93,24 @@ class Game:
         
         self.ball.update(self.players, self.display)
         ############################## Detecção dos gols ##############################
-        
+        gol = 0
         if self.ball.pos[0] < 150 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
             self.ball.pos = [683, 382]
             self.ball.vel = [0, 0]
             self.placar[1] += 1
-        
+            gol = 1
         if self.ball.pos[0] > 1216 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
             self.ball.pos = [683, 382]
             self.ball.vel = [0, 0]
             self.placar[0] += 1
+            gol = 1
+        
+        ts = time()
+        # print(self.players)
+        if gol:
+            for player in self.players.values():
+                player["attack_ts"] = ts
+                player["pos"] = respawn_points[player["id"]]
 
         self.ball.pos[0] += self.ball.vel[0]
         self.ball.pos[1] += self.ball.vel[1]
