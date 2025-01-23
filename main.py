@@ -25,7 +25,7 @@ GRID_COLOR = (0, 0, 0)
 BG_COLOR = (20, 20, 20)
 BACKGROUND_COLOR = (0, 0, 0)
 
-name = input("Insira seunome: ")
+name = input("Insira seu nome: ")
 
 class Game:
     def __init__(self, app, name):
