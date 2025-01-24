@@ -47,6 +47,7 @@ class Player:
         self.pos = pg.Vector2(100, 100)
         self.size = 25
         self.life = 100
+        self.run = 0
         self.attack_ts = 0
         self.last_attack = 0
         self.attack_target = None
@@ -57,11 +58,13 @@ class Player:
         self.id = id
         self.team = self.id % 2 + 1
         self.data = {"pos": [0, 0], "id": id}
+        self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
+        self.texture = pg.transform.scale(self.texture, (128, 128))
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
-        run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5)
-        if run:
+        self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5)
+        if self.run:
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
         
@@ -113,7 +116,14 @@ class Player:
 
     def draw(self, screen):
         pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 5)
-        pg.draw.circle(screen, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.size+2)
-        pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
+        # pg.draw.circle(screen, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.size+2)
+        
+        frame_y = 64 if self.cursor.pos.x < 0 else 0
+        frame_x = int((time() * 4) % 2) * 64
+
+        texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
+        screen.blit(self.texture, self.pos - pg.Vector2(32, 32), texture_rect)
+
+        # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)
