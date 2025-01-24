@@ -10,9 +10,9 @@ from modules.player import Player
 def draw_grid(surface, color, cell_size):
     width, height = surface.get_size()
     for x in range(0, width, cell_size):
-        pg.draw.line(surface, color, (x, 0), (x, height), width=4)
+        pg.draw.line(surface, color, (x, 0), (x, height), width=1)
     for y in range(0, height, cell_size):
-        pg.draw.line(surface, color, (0, y), (width, y), width=4)
+        pg.draw.line(surface, color, (0, y), (width, y), width=1)
 
 pg.init()
 pg.mouse.set_visible(0)
@@ -21,8 +21,8 @@ DW, DH = d.current_w, d.current_h
 del d
 
 GREEN = (0, 255, 0)
-GRID_COLOR = (0, 0, 0)
-BG_COLOR = (20, 20, 20)
+GRID_COLOR = (50, 50, 50)
+BG_COLOR = (200, 200, 200)
 BACKGROUND_COLOR = (0, 0, 0)
 
 name = input("Insira seu nome: ")
@@ -80,15 +80,16 @@ class Game:
 
         draw_grid(self.screen, GRID_COLOR, 40)
         
-        pg.draw.rect(self.screen, (255, 255, 255), (0, 200, 150, 368), width=4)
-        pg.draw.rect(self.screen, (255, 255, 255), (1216, 200, 150, 368), width=4)
+        pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
+        pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
         
+        self.ball.draw(self.screen)
+
         for id, enemy in self.players.items():
             if id != self.player.id:
                 enemy.draw(self.screen)
         self.player.draw(self.screen)
 
-        self.ball.draw(self.screen)
         
         # Debug
         self.debug(f"Player: {self.player.pos}", 0)
@@ -112,8 +113,9 @@ class Game:
 
 server_ip = jsonbin.get_ip()
 app = Client(server_ip=server_ip)
-app.run(wait=False)
 game = Game(app, name)
+
+app.run(wait=False)
 
 @app.route("id")
 def id(data, addr):

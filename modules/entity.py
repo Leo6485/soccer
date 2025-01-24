@@ -18,9 +18,13 @@ class Ball:
     def __init__(self):
         self.size = 80
         self.pos = (100, 100)
+        self.texture = pg.image.load("assets/textures/disc/disc.png")
+        self.texture = pg.transform.scale(self.texture, (self.size * 4, self.size * 4))
 
-    def draw(self, screen):        
-        pg.draw.circle(screen, (150, 150, 150), self.pos, self.size)
+    def draw(self, screen):
+        texture_rect = self.texture.get_rect(center=self.pos)
+        screen.blit(self.texture, texture_rect)
+        # pg.draw.circle(screen, (255, 255, 255), self.pos, self.size, width=2)
 
     def calc_dist(self, pos):
         d = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
