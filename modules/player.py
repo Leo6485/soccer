@@ -59,7 +59,7 @@ class Player:
         self.team = self.id % 2 + 1
         self.data = {"pos": [0, 0], "id": id}
         self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
-        self.texture = pg.transform.scale(self.texture, (128, 128))
+        self.texture = pg.transform.scale(self.texture, (192, 128))
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
@@ -112,6 +112,7 @@ class Player:
                         "attack_ts": self.attack_ts,
                         "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y],
                         "attack_target": self.attack_target,
+                        "running": self.run
                      }
 
     def draw(self, screen):
@@ -119,7 +120,9 @@ class Player:
         # pg.draw.circle(screen, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.size+2)
         
         frame_y = 64 if self.cursor.pos.x < 0 else 0
-        frame_x = int((time() * 4) % 2) * 64
+        frame_x = int((time() * 6) % 3) * 64
+        
+        frame_x = frame_x if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
         screen.blit(self.texture, (self.pos.x-32, self.pos.y-50), texture_rect)

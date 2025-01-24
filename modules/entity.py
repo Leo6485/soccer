@@ -1,18 +1,29 @@
 import pygame as pg
 from math import sqrt
+from time import time
 
-class Enemy:
+class Enemy():
     def __init__(self, id, name):
         self.id = id
         self.size = 25
         self.pos = pg.Vector2(0, 0)
         self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
+        self.texture = None
+        self.run = 0
     
     def draw(self, screen):
         pg.draw.circle(screen, (255, 0, 0), (int(self.pos[0]), int(self.pos[1])), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos[0], self.pos[1] - self.size - 10))
         screen.blit(self.name_text, text_rect)
+
+        frame_y = 1 # 64 if self.cursor.pos.x < 0 else 0
+        frame_x = int((time() * 6) % 3) * 64
+        
+        frame_x = frame_x if self.run else 128
+
+        texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
+        screen.blit(self.texture, (self.pos[0]-32, self.pos[1]-50), texture_rect)
 
 class Ball:
     def __init__(self):
