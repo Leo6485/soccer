@@ -130,7 +130,7 @@ def connect(data, addr):
 
     print(f"Novo jogador conectado: {data}")
 
-    return json.dumps({"type": "ID", "data": {"id": player_id, "respawn_ts": time()}})
+    return {"type": "ID", "data": {"id": player_id, "respawn_ts": time()}}
 
 @app.route("UPDATE")
 def update(data, addr):
@@ -147,7 +147,7 @@ def update(data, addr):
 def quit(data, addr):
     global game, app
     for c in game.clients:
-        app.send(json.dumps({"type": "QUIT"}), c)
+        app.send({"type": "QUIT"}, c)
 
     game = Game()
     app.stop()
@@ -161,7 +161,7 @@ app.run(wait=False)
 def send_updates():
     for c in game.clients:
         print(c)
-        app.send(json.dumps({"type": "UPDATE", "data": {"ball": [round(i, 2) for i in game.ball.pos], "players": game.players, "placar": game.placar}}), c)
+        app.send({"type": "UPDATE", "data": {"ball": [round(i, 2) for i in game.ball.pos], "players": game.players, "placar": game.placar}}, c)
 
 while True:
     try:

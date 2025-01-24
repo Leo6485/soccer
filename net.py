@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 import json
+import pickle
 
 class Server:
     def __init__(self, ip=None, port=5454):
@@ -13,9 +14,10 @@ class Server:
         print(f"[ * ] Vinculado como: {self.ip}:{self.port}")
     
     def parse(self, data):
-        data = data.decode().strip()
-        data = json.loads(data)
-
+        # data = data.decode().strip()
+        # data = json.loads(data)
+        
+        data = pickle.loads(data)
         route = data.get("type", None).upper()
         # print(f"\033[1;34mDados recebidos: \033[1;32m{data}\n\033[1;34mRota: \033[1;32m{route}\033[0m")
 
@@ -23,14 +25,14 @@ class Server:
 
     def listen(self):
         try:
-            data, addr = self.server.recvfrom(2048)
+            data, addr = self.server.recvfrom(1024)
             def go_route(data, addr):
                 data, route = self.parse(data)
 
                 response = self.routes.get(route, print)(data["data"], addr)
 
                 if response:
-                    self.server.sendto(response.encode(), addr)
+                    self.server.sendto(pickle.dumps(response), addr)
 
             Thread(target=go_route, args=(data, addr)).start()
         except KeyboardInterrupt:
@@ -48,7 +50,7 @@ class Server:
         return wrap0
 
     def send(self, data, addr):
-        self.server.sendto(data.encode(), addr)
+        self.server.sendto(pickle.dumps(data), addr)
 
     def run(self, wait=True):
         self.running = True
@@ -106,4 +108,4 @@ class Client(Server):
         print(f"Conectado com: {self.server_ip}")
 
     def send(self, data):
-        self.server.sendto(data.encode(), (self.server_ip, self.port))
+        self.server.sendto(pickle.dumps(data), (self.server_ip, self.port))

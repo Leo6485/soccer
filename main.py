@@ -37,7 +37,7 @@ class Game:
         self.players = {}
 
         data = {"type": "CONNECT", "data": {"name": self.player.name}}
-        self.app.send(json.dumps(data))
+        self.app.send(data)
 
         self.ball = Ball()
 
@@ -45,6 +45,9 @@ class Game:
         self.padding = ((DW - 1920 * self.scale) / 2, (DH - 1080 * self.scale) / 2)
         self.running = True
         
+        texture_path = "assets/textures/player"
+        self.player_textures = [pg.image.load(texture_path + "/pato1.png"), pg.image.load(texture_path + "/pato2.png")]
+        self.player_textures = [pg.transform.scale(texture, (192, 128)) for texture in self.player_textures]
         # Debug
         
         self.debug_font = pg.font.Font(None, 15)
@@ -73,7 +76,7 @@ class Game:
                       }
 
         if self.player.id != -1:
-            self.app.send(json.dumps(player_data))
+            self.app.send(player_data)
 
     def draw(self):
         self.screen.fill(BG_COLOR)
@@ -82,7 +85,7 @@ class Game:
         
         pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
         pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
-        
+
         self.ball.draw(self.screen)
 
         for id, enemy in self.players.items():
@@ -98,7 +101,7 @@ class Game:
         self.debug(f"FPS: {self.clock.get_fps():.2f}", 3)
         self.debug(f"PKG/s: {self.pkgs:.2f}", 4)
         pg.display.flip()
-    
+
     def debug(self, text, offset):
         text = self.debug_font.render(text, True, (255, 0, 0))
         text_rect = text.get_rect(topleft=(10, 25*offset))
@@ -120,6 +123,7 @@ app.run(wait=False)
 @app.route("id")
 def id(data, addr):
     game.player.id = data["id"]
+    game.player.texture = game.player_textures[data["id"]%2]
     game.players[data["id"]] = game.player
 
 @app.route("update")
@@ -131,8 +135,11 @@ def update(data, addr):
             if id in game.players.keys():
                 game.players[id].pos = player["pos"]
             else:
-                game.players[id] = Enemy(player["id"], player["name"])
-                game.players[id].pos = player["pos"]
+                enemy = Enemy(player["id"], player["name"])
+                enemy.pos = player["pos"]
+                enemy.texture = game.player_textures[id%2]
+                
+                game.players[id] = enemy
         
         else:
             game.player.respawn_ts = player.get("respawn_ts")
