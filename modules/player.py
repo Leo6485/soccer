@@ -122,7 +122,7 @@ class Player:
         frame_x = int((time() * 4) % 2) * 64
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, self.pos - pg.Vector2(32, 32), texture_rect)
+        screen.blit(self.texture, (self.pos.x-32, self.pos.y-50), texture_rect)
 
         # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))

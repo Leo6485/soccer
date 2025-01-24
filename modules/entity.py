@@ -19,7 +19,7 @@ class Ball:
         self.size = 80
         self.pos = (100, 100)
         self.texture = pg.image.load("assets/textures/disc/disc.png")
-        self.texture = pg.transform.scale(self.texture, (self.size * 4, self.size * 4))
+        self.texture = pg.transform.scale(self.texture, (self.size * 4.5, self.size * 4.5))
 
     def draw(self, screen):
         texture_rect = self.texture.get_rect(center=self.pos)
