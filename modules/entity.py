@@ -11,13 +11,13 @@ class Enemy():
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
         self.texture = None
         self.run = 0
+        self.dir = 0
     
     def draw(self, screen):
-        pg.draw.circle(screen, (255, 0, 0), (int(self.pos[0]), int(self.pos[1])), self.size)
+        # pg.draw.circle(screen, (255, 0, 0), (int(self.pos[0]), int(self.pos[1])), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos[0], self.pos[1] - self.size - 10))
         screen.blit(self.name_text, text_rect)
-
-        frame_y = 1 # 64 if self.cursor.pos.x < 0 else 0
+        frame_y = 64 if self.dir else 0
         frame_x = int((time() * 6) % 3) * 64
         
         frame_x = frame_x if self.run else 128

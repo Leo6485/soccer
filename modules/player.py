@@ -48,6 +48,7 @@ class Player:
         self.size = 25
         self.life = 100
         self.run = 0
+        self.dir = 0
         self.attack_ts = 0
         self.last_attack = 0
         self.attack_target = None
@@ -63,6 +64,9 @@ class Player:
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
+        
+        
+        self.dir = self.cursor.pos.x < 0
         self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5)
         if self.run:
             self.pos.y += self.cursor.delta.y * self.vel
@@ -112,7 +116,8 @@ class Player:
                         "attack_ts": self.attack_ts,
                         "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y],
                         "attack_target": self.attack_target,
-                        "running": self.run
+                        "run": self.run,
+                        "dir": self.dir
                      }
 
     def draw(self, screen):

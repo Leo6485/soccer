@@ -134,6 +134,8 @@ def update(data, addr):
         if id != game.player.id:
             if id in game.players.keys():
                 game.players[id].pos = player["pos"]
+                game.players[id].run = player.get("run", 0)
+                game.players[id].dir = player.get("dir", False)
             else:
                 enemy = Enemy(player["id"], player["name"])
                 enemy.pos = player["pos"]

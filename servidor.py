@@ -142,6 +142,8 @@ def update(data, addr):
         player["attack_ts"] = data["attack_ts"]
         player["cursor_pos"] = data["cursor_pos"]
         player["attack_target"] = data["attack_target"]
+        player["run"] = data["run"]
+        player["dir"] = data["dir"]
 
 @app.route("QUIT")
 def quit(data, addr):
@@ -160,7 +162,6 @@ app.run(wait=False)
 
 def send_updates():
     for c in game.clients:
-        print(c)
         app.send({"type": "UPDATE", "data": {"ball": [round(i, 2) for i in game.ball.pos], "players": game.players, "placar": game.placar}}, c)
 
 while True:

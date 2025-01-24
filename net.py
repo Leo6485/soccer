@@ -50,7 +50,7 @@ class Server:
         return wrap0
 
     def send(self, data, addr):
-        self.server.sendto(pickle.dumps(data), addr)
+        Thread(target=self.server.sendto, args = (pickle.dumps(data), addr)).start()
 
     def run(self, wait=True):
         self.running = True
