@@ -8,13 +8,6 @@ from modules.entity import *
 from modules.player import Player
 import traceback
 
-def draw_grid(surface, color, cell_size):
-    width, height = surface.get_size()
-    for x in range(0, width, cell_size):
-        pg.draw.line(surface, color, (x, 0), (x, height), width=1)
-    for y in range(0, height, cell_size):
-        pg.draw.line(surface, color, (0, y), (width, y), width=1)
-
 pg.init()
 pg.mouse.set_visible(0)
 d = pg.display.Info()
