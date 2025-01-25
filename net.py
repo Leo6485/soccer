@@ -54,7 +54,7 @@ class Server:
 
     def run(self, wait=True):
         self.running = True
-        self.server.settimeout(0.5)
+        self.server.settimeout(0.1)
         self.threads = {}
         print("[ * ] Aguardando conexões")
         if not wait:

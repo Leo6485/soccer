@@ -29,11 +29,15 @@ class Ball:
     def __init__(self):
         self.size = 80
         self.pos = (100, 100)
+        self.interpolated_pos = [100, 100]
         self.texture = pg.image.load("assets/textures/disc/disc.png")
         self.texture = pg.transform.scale(self.texture, (self.size * 4.5, self.size * 4.5))
 
     def draw(self, screen):
-        texture_rect = self.texture.get_rect(center=self.pos)
+        self.interpolated_pos[0] += self.pos[0] - self.interpolated_pos[0]
+        self.interpolated_pos[1] += self.pos[1] - self.interpolated_pos[1]
+
+        texture_rect = self.texture.get_rect(center=self.interpolated_pos)
         screen.blit(self.texture, texture_rect)
         # pg.draw.circle(screen, (255, 255, 255), self.pos, self.size, width=2)
 

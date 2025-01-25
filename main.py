@@ -6,6 +6,7 @@ import jsonbin
 from net import Client
 from modules.entity import *
 from modules.player import Player
+import traceback
 
 def draw_grid(surface, color, cell_size):
     width, height = surface.get_size()
@@ -45,14 +46,19 @@ class Game:
         self.padding = ((DW - 1920 * self.scale) / 2, (DH - 1080 * self.scale) / 2)
         self.running = True
         
+        # Texturas
+        self.map_texture = pg.image.load("assets/textures/map/campo.png").convert()
+        self.map_texture = pg.transform.scale(self.map_texture, (DW, DH))
+
         texture_path = "assets/textures/player"
-        self.player_textures = [pg.image.load(texture_path + "/pato1.png"), pg.image.load(texture_path + "/pato2.png")]
+        self.player_textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
         self.player_textures = [pg.transform.scale(texture, (192, 128)) for texture in self.player_textures]
+
         # Debug
-        
         self.debug_font = pg.font.Font(None, 15)
         self.last_pkg = 0
-        self.pkgs = 1
+        self.pkg_time = 1
+        self.update_time = 0
 
     def update(self):
         for e in pg.event.get():
@@ -81,7 +87,9 @@ class Game:
     def draw(self):
         self.screen.fill(BG_COLOR)
 
-        draw_grid(self.screen, GRID_COLOR, 40)
+        self.screen.blit(self.map_texture, (0, 0))
+
+        # draw_grid(self.screen, GRID_COLOR, 40)
         
         pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
         pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
@@ -99,7 +107,8 @@ class Game:
         self.debug(f"Ball: {self.ball.pos}", 1)
         self.debug(f"Placar: {self.placar}", 2)
         self.debug(f"FPS: {self.clock.get_fps():.2f}", 3)
-        self.debug(f"PKG/s: {self.pkgs:.2f}", 4)
+        self.debug(f"PKG time: {self.pkg_time:.4f}", 4)
+        self.debug(f"Update time: {self.update_time:.4f}", 5)
         pg.display.flip()
 
     def debug(self, text, offset):
@@ -110,8 +119,11 @@ class Game:
     def run(self):
         self.clock = pg.time.Clock()
         while self.running:
+            start_time = time()
             self.update()
             self.draw()
+            end_time = time()
+            self.update_time = end_time - start_time
             self.clock.tick(60)
 
 server_ip = jsonbin.get_ip()
@@ -153,11 +165,13 @@ def update(data, addr):
     # Debug
     t = time()
     d = (t - game.last_pkg)
-    game.pkgs = 1.0/ d if d else 1
+    game.pkg_time = d if d else 1
     game.last_pkg = t
     game.last_pkg = time()
     ##############################
-
-game.run()
+try:
+    game.run()
+except Exception:
+    traceback.print_exc()
 pg.quit()
 app.stop()

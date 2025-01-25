@@ -168,8 +168,7 @@ while True:
     try:
         game.update()
         send_updates()
-
-        sleep(1 / 120)
+        sleep(1/120)
     except KeyboardInterrupt:
             break
 

@@ -100,7 +100,7 @@ class Player:
                     cursor = pg.Vector2(self.pos.x + self.cursor.pos.x, self.pos.y + self.cursor.pos.y)
                     distance = sqrt((target[0] - cursor.x)**2 + (target[1] - cursor.y)**2)
 
-                    if distance < 50:
+                    if distance < 100:
                         self.attack_target = player.id
 
                 self.attack_ts = time()
@@ -117,11 +117,12 @@ class Player:
                         "cursor_pos": [self.cursor.pos.x + self.pos.x, self.cursor.pos.y + self.pos.y],
                         "attack_target": self.attack_target,
                         "run": self.run,
-                        "dir": self.dir
+                        "dir": self.dir,
                      }
 
     def draw(self, screen):
-        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 5)
+        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 4)
+        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 20, width=2)
         # pg.draw.circle(screen, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.size+2)
         
         frame_y = 64 if self.cursor.pos.x < 0 else 0
