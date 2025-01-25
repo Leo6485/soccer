@@ -55,7 +55,7 @@ class Player:
         self.respawn_ts = 0
         self.cursor = Cursor()
         self.name = name
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
         self.id = id
         self.team = self.id % 2 + 1
         self.data = {"pos": [0, 0], "id": id}
@@ -131,7 +131,7 @@ class Player:
         frame_x = frame_x if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (self.pos.x-32, self.pos.y-50), texture_rect)
+        screen.blit(self.texture, (self.pos.x-32, self.pos.y-42), texture_rect)
 
         # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))

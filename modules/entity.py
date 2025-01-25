@@ -8,7 +8,7 @@ class Enemy():
         self.size = 25
         self.pos = pg.Vector2(0, 0)
         self.name = name
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 255, 255))
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
         self.texture = None
         self.run = 0
         self.dir = 0
@@ -23,7 +23,7 @@ class Enemy():
         frame_x = frame_x if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (self.pos[0]-32, self.pos[1]-50), texture_rect)
+        screen.blit(self.texture, (self.pos[0]-32, self.pos[1]-42), texture_rect)
 
 class Ball:
     def __init__(self):
