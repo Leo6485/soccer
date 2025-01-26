@@ -21,9 +21,6 @@ class Enemy():
     
     def update(self):
         crr_time = time()
-        if crr_time - self.last_update > 1:
-            self.pos = pg.Vector2(-10000, -10000)
-
         if crr_time - self.respawn_ts < 1.5:
             self.interpolated_pos = self.pos
         else:

@@ -34,6 +34,7 @@ class Game:
         self.padding = pg.Vector2((DW - self.DD.x * self.scale) / 2, (DH - self.DD.y * self.scale) / 2)
 
         # Variáveis do jogo
+        self.IDs = [False]*4
         self.placar = [0, 0]
         self.player = Player(-1, name)
         self.players = {}
@@ -72,10 +73,10 @@ class Game:
         
         self.ball.update()
         for id, p in self.players.items():
-            if id != self.player.id:
+            if id != self.player.id and self.IDs[id]:
                 p.update()
 
-        self.player.update(pressed, mouse_pressed, self.ball, self.players)
+        self.player.update(pressed, mouse_pressed, self.ball, self.players, self.IDs)
         self.send_updates()
 
     def send_updates(self):
@@ -101,9 +102,9 @@ class Game:
 
         self.ball.draw(self.screen)
 
-        for id, enemy in self.players.items():
-            if id != self.player.id:
-                enemy.draw(self.screen)
+        for id, p in self.players.items():
+            if id != self.player.id and self.IDs[id]:
+                p.draw(self.screen)
         self.player.draw(self.screen)
 
         # Debug
@@ -146,6 +147,7 @@ def id(data, addr):
 def update(data, addr):
     crr_time = time()
     game.ball.pos = pg.Vector2(data["ball"])
+    game.IDs = data["IDs"]
     for player in data["players"].values():
         id = player["id"]
         
@@ -163,7 +165,7 @@ def update(data, addr):
                 enemy.pos = player["pos"]
                 enemy.texture = game.player_textures[id%2]
                 game.players[id] = enemy
-                game.players[id].last_update = crr_time
+                game.players[id].last_update = player.get("last_update", 0)
         
         # Player atual
         else:

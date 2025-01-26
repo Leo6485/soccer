@@ -66,9 +66,8 @@ class Player:
         self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
         self.texture = pg.transform.scale(self.texture, (192, 128))
 
-    def update(self, pressed, mouse_pressed, ball, players):
+    def update(self, pressed, mouse_pressed, ball, players, IDs):
         self.cursor.update()
-        
         
         self.dir = self.cursor.pos.x < 0
         self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5)
@@ -96,8 +95,8 @@ class Player:
                 self.attack_target = None
                 
                 ########## Verifica se o cursor está em cima de um player ##########
-                for player in players.values():
-                    if player.id == self.id:
+                for id, player in players.items():
+                    if player.id == self.id and IDs[id]:
                         continue
 
                     target = player.interpolated_pos

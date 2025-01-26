@@ -8,6 +8,7 @@ from net import Server
 from pygame import Vector2
 
 respawn_points = [Vector2(50, 50), Vector2(1316, 50), Vector2(50, 718), Vector2(1316, 718)]
+IDs = [False]*4
 
 class Ball:
     def __init__(self):
@@ -15,10 +16,11 @@ class Ball:
         self.vel = Vector2(0, 0)
         self.size = 85
     
-    def update(self, players, display):
-        for player in players.values():
-            self.update_move(player)
-        
+    def update(self, players, display, IDs):
+        for id, player in players.items():
+            if IDs[id]:
+                self.update_move(player)
+
         self.update_collision(display)
     
     def update_move(self, player):
@@ -59,6 +61,7 @@ class Game:
         self.players = {}
         self.ball = Ball()
         self.clients = {}
+        self.IDs = [False]*4
         self.display = Vector2(1366, 768)
         self.placar = [0, 0]
         self.started = False
@@ -67,9 +70,13 @@ class Game:
         self.__init__(self)
     
     def get_free_id(self):
-        for i in range(4):
-            if not self.players.get(i):
-                return i
+        try:
+            id = self.IDs.index(False)
+            self.IDs[id] = True
+            return id
+
+        except ValueError:
+            return None
 
     def update(self):
         crr_time = time()
@@ -77,8 +84,7 @@ class Game:
         for id, player in self.players.items():
             ############################## Desconecta clientes inativos ##############################
             if crr_time - player.get("last_update") > 1:
-                to_delete.append(id)
-                continue
+                self.IDs[id] = False
 
             ############################## Ataque ##############################
             att_ts = player.get("attack_ts", 0)
@@ -102,13 +108,8 @@ class Game:
                             self.players[id]["respawn_ts"] = crr_time
 
                 player["last_attack"] = crr_time
-        
-        for id in to_delete:
-            print(f"Deletando id {id}")
-            del self.clients[id]
-            del self.players[id]
 
-        self.ball.update(self.players, self.display)
+        self.ball.update(self.players, self.display, self.IDs)
         ############################## Detecção dos gols ##############################
         gol = 0
         if self.ball.pos.x < 150 and 200 < self.ball.pos.y < 568:
@@ -137,7 +138,11 @@ game = Game()
 @app.route("CONNECT")
 def connect(data, addr):
     crr_time = time()
+
     player_id = game.get_free_id()
+    if player_id is None:
+        return
+
     player_data = {
         "addr": addr,
         "pos": respawn_points[player_id],
@@ -192,18 +197,18 @@ print("/033c", end="\r")
 app.run(wait=False)
 
 def send_updates():
-    # Evita a mudança do dict durante a iteração
-    clients = tuple(game.clients.values())
-
-    for c in clients:
-        app.send({
+    data = {
             "type": "UPDATE",
             "data": {
                 "ball": [round(i, 2) for i in game.ball.pos],
                 "players": game.players,
+                "IDs": game.IDs,
                 "placar": game.placar
             }
-        }, c)
+        }
+    for id, c in game.clients.items():
+        if game.IDs[id]:
+            app.send(data, c)
 
 while True:
     try:
