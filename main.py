@@ -1,10 +1,8 @@
 import pygame as pg
 from time import time
-from math import sqrt
-import json
 import modules.jsonbin as jsonbin
 from modules.net import Client
-from modules.entity import *
+from modules.entity import Enemy, Ball
 from modules.player import Player
 import traceback
 
@@ -18,8 +16,6 @@ GREEN = (0, 255, 0)
 GRID_COLOR = (50, 50, 50)
 BG_COLOR = (200, 200, 200)
 BACKGROUND_COLOR = (0, 0, 0)
-
-name = input("Insira seu nome: ")
 
 class Game:
     def __init__(self, app, name):
@@ -133,6 +129,8 @@ class Game:
 
 server_ip = jsonbin.get_ip()
 app = Client(server_ip=server_ip)
+
+name = input("Insira seu nome: ")
 game = Game(app, name)
 
 app.run(wait=False)
