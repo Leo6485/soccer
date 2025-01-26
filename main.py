@@ -63,6 +63,11 @@ class Game:
 
         if pressed[pg.K_q]:
             self.running = False
+        
+        self.ball.update()
+        for id, p in self.players.items():
+            if id != self.player.id:
+                p.update()
 
         self.player.update(pressed, mouse_pressed, self.ball, self.players)
         self.send_updates()
@@ -133,17 +138,18 @@ def id(data, addr):
 
 @app.route("update")
 def update(data, addr):
-    game.ball.pos = data["ball"]
+    game.ball.pos = pg.Vector2(data["ball"])
     for player in data["players"].values():
         id = player["id"]
         if id != game.player.id:
             if id in game.players.keys():
-                game.players[id].pos = player["pos"]
+                game.players[id].pos = pg.Vector2(player["pos"])
                 game.players[id].run = player.get("run", 0)
                 game.players[id].dir = player.get("dir", False)
+                game.players[id].respawn_ts = player.get("respawn_ts", 0)
             else:
                 enemy = Enemy(player["id"], player["name"])
-                enemy.pos = player["pos"]
+                enemy.pos = pg.Vector2(player["pos"])
                 enemy.texture = game.player_textures[id%2]
                 
                 game.players[id] = enemy
@@ -152,13 +158,13 @@ def update(data, addr):
             game.player.respawn_ts = player.get("respawn_ts")
             if time() - player.get("respawn_ts", 0) < 0.5:
                 game.player.pos = pg.Vector2(player["pos"])
-    
+
     game.placar = data["placar"]
 
     # Debug
     t = time()
     d = (t - game.last_pkg)
-    game.pkg_time = d if d else 1
+    game.pkg_time = (1/d + game.pkg_time)/2 if d else 1
     game.last_pkg = t
     game.last_pkg = time()
     ##############################

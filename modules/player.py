@@ -34,33 +34,40 @@ class Cursor:
                 self.delta.x = 0
                 self.delta.y = 0
 
-        cr = 10
+        cursor_range = 10
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
-        if not (DW/cr < self.last_cursor_pos.x < (cr-1) * DW/cr) or not (DH/cr < self.last_cursor_pos.y < (cr-1) * DH/cr):
+        if not (DW/cursor_range < self.last_cursor_pos.x < (cursor_range-1) * DW/cursor_range) or not (DH/cursor_range < self.last_cursor_pos.y < (cursor_range-1) * DH/cursor_range):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
+
+    def draw(self, screen, player_pos):
+        pg.draw.circle(screen, (0, 255, 0), ((player_pos.x + self.pos.x), (player_pos.y + self.pos.y)), 4)
+        pg.draw.circle(screen, (0, 255, 0), ((player_pos.x + self.pos.x), (player_pos.y + self.pos.y)), 20, width=2)
 
 class Player:
     vel = 0.05
 
     def __init__(self, id, name):
+        self.cursor = Cursor()
         self.pos = pg.Vector2(100, 100)
         self.size = 25
-        self.life = 100
+        self.id = id
+
+        self.name = name
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
+        
+        # Textura padrão, é alterada ao conectar e receber o id
+        self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
+        self.texture = pg.transform.scale(self.texture, (192, 128))
+        
+        # Variáveis utilizadas na conexão e afins
         self.run = 0
         self.dir = 0
         self.attack_ts = 0
         self.last_attack = 0
         self.attack_target = None
         self.respawn_ts = 0
-        self.cursor = Cursor()
-        self.name = name
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
-        self.id = id
-        self.team = self.id % 2 + 1
         self.data = {"pos": [0, 0], "id": id}
-        self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
-        self.texture = pg.transform.scale(self.texture, (192, 128))
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
@@ -96,9 +103,9 @@ class Player:
                     if player.id == self.id:
                         continue
 
-                    target = player.pos
+                    target = player.interpolated_pos
                     cursor = pg.Vector2(self.pos.x + self.cursor.pos.x, self.pos.y + self.cursor.pos.y)
-                    distance = sqrt((target[0] - cursor.x)**2 + (target[1] - cursor.y)**2)
+                    distance = sqrt((target.x - cursor.x)**2 + (target.y - cursor.y)**2)
 
                     if distance < 100:
                         self.attack_target = player.id
@@ -121,10 +128,9 @@ class Player:
                      }
 
     def draw(self, screen):
-        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 4)
-        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 20, width=2)
-        # pg.draw.circle(screen, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.size+2)
-        
+        # Desenha o cursor
+        self.cursor.draw(screen, self.pos)
+
         frame_y = 64 if self.cursor.pos.x < 0 else 0
         frame_x = int((time() * 6) % 3) * 64
         
