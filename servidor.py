@@ -2,7 +2,7 @@ from time import sleep
 from os import _exit
 from time import time
 import modules.jsonbin as jsonbin
-from net import Server
+from modules.net import Server
 from pygame import Vector2
 
 respawn_points = [Vector2(50, 50), Vector2(1316, 50), Vector2(50, 718), Vector2(1316, 718)]

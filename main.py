@@ -3,7 +3,7 @@ from time import time
 from math import sqrt
 import json
 import modules.jsonbin as jsonbin
-from net import Client
+from modules.net import Client
 from modules.entity import *
 from modules.player import Player
 import traceback
