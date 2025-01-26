@@ -57,7 +57,7 @@ class Player:
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
         
         # Textura padrão, é alterada ao conectar e receber o id
-        self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
+        self.texture = pg.image.load(f"assets/textures/player/pato1.png")
         self.texture = pg.transform.scale(self.texture, (192, 128))
         
         # Variáveis utilizadas na conexão e afins
