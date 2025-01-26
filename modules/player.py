@@ -98,8 +98,7 @@ class Player:
 
                     target = player.interpolated_pos
                     cursor = pg.Vector2(self.pos.x + self.cursor.pos.x, self.pos.y + self.cursor.pos.y)
-                    distance = sqrt((target.x - cursor.x)**2 + (target.y - cursor.y)**2)
-
+                    distance = cursor.distance_to(target)
                     if distance < 100:
                         self.attack_target = player.id
 
