@@ -92,6 +92,7 @@ class Game:
 
         # draw_grid(self.screen, GRID_COLOR, 40)
         
+        # Gols
         pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
         pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
 
@@ -102,7 +103,6 @@ class Game:
                 enemy.draw(self.screen)
         self.player.draw(self.screen)
 
-        
         # Debug
         self.debug(f"Player: {self.player.pos}", 0)
         self.debug(f"Ball: {self.ball.pos}", 1)
