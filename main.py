@@ -147,19 +147,22 @@ def update(data, addr):
     game.ball.pos = pg.Vector2(data["ball"])
     for player in data["players"].values():
         id = player["id"]
+        
+        # Outros players
         if id != game.player.id:
             if id in game.players.keys():
                 game.players[id].pos = player["pos"]
                 game.players[id].run = player.get("run", 0)
                 game.players[id].dir = player.get("dir", False)
                 game.players[id].respawn_ts = player.get("respawn_ts", 0)
+            # Caso o inimigo ainda não tenha sido instanciado
             else:
                 enemy = Enemy(player["id"], player["name"])
                 enemy.pos = player["pos"]
                 enemy.texture = game.player_textures[id%2]
-                
                 game.players[id] = enemy
         
+        # Player atual
         else:
             game.player.respawn_ts = player.get("respawn_ts")
             if time() - player.get("respawn_ts", 0) < 0.5:

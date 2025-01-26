@@ -88,20 +88,23 @@ class Game:
             # Delay aceito e cooldown
             if crr_time - att_ts < 0.5 and att_ts - last_att > 0.5:
                 if attack_target is not None:
-                    target_player = self.players[attack_target]
-                    target = target_player["pos"]
-                    cursor = player["cursor_pos"]
-                    distancia = (target - cursor).length()
-                    if distancia < 50:
-                        print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
-                        id = target_player["id"]
-                        pos = respawn_points[id]
-                        self.players[id]["pos"] = pos   
-                        self.players[id]["respawn_ts"] = crr_time
+                    target_player = self.players.get(attack_target)
+                    
+                    if target_player:
+                        target = target_player["pos"]
+                        cursor = player["cursor_pos"]
+                        distancia = (target - cursor).length()
+                        if distancia < 50:
+                            print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
+                            id = target_player["id"]
+                            pos = respawn_points[id]
+                            self.players[id]["pos"] = pos   
+                            self.players[id]["respawn_ts"] = crr_time
 
                 player["last_attack"] = crr_time
         
         for id in to_delete:
+            print(f"Deletando id {id}")
             del self.clients[id]
             del self.players[id]
 
@@ -189,7 +192,9 @@ print("/033c", end="\r")
 app.run(wait=False)
 
 def send_updates():
-    for c in game.clients.values():
+    # Evita a alteração dos clients durante a iteração
+    clients = game.clients.values()
+    for c in clients:
         app.send({
             "type": "UPDATE",
             "data": {
