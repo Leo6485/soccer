@@ -5,6 +5,7 @@ from time import time
 class Enemy():
     def __init__(self, id, name):
         self.id = id
+        self.team = self.id%2 + 1
         self.size = 25
         self.pos = pg.Vector2(0, 0)
         self.interpolated_pos = pg.Vector2(0, 0)
@@ -19,6 +20,10 @@ class Enemy():
         self.dir = 0
         self.last_update = time()
     
+    def reset_name(self, name):
+        self.name = name
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
+
     def update(self):
         crr_time = time()
         if crr_time - self.respawn_ts < 1.5:

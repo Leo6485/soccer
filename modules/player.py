@@ -92,7 +92,7 @@ class Player:
                 
                 ########## Verifica se o cursor está em cima de um player ##########
                 for id, player in players.items():
-                    if player.id == self.id and IDs[id]:
+                    if player.team == self.team and IDs[id]:
                         continue
 
                     target = player.interpolated_pos

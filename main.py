@@ -110,6 +110,7 @@ class Game:
         self.debug(f"FPS: {self.clock.get_fps():.2f}", 3)
         self.debug(f"PKG/s: {self.pkg_ps:.4f}", 4)
         self.debug(f"Update PS: {(1/self.update_time):.2f}", 5)
+        self.debug(f"Team: {self.player.team}", 6)
         pg.display.flip()
 
     def debug(self, text, offset):
@@ -140,6 +141,7 @@ def id(data, addr):
     game.player.id = data["id"]
     game.player.texture = game.player_textures[data["id"]%2]
     game.players[data["id"]] = game.player
+    game.player.team = game.player.id%2 + 1
 
 @app.route("update")
 def update(data, addr):
@@ -148,27 +150,14 @@ def update(data, addr):
     game.IDs = data["IDs"]
     for player in data["players"].values():
         id = player["id"]
-        
-        # Outros players
+
         if id != game.player.id:
-            if id in game.players.keys():
-                game.players[id].pos = player["pos"]
-                game.players[id].run = player.get("run", 0)
-                game.players[id].dir = player.get("dir", False)
-                game.players[id].respawn_ts = player.get("respawn_ts", 0)
-                game.players[id].last_update = crr_time
-            # Caso o inimigo ainda não tenha sido instanciado
-            else:
-                enemy = Enemy(player["id"], player["name"])
-                enemy.pos = player["pos"]
-                enemy.texture = game.player_textures[id%2]
-                game.players[id] = enemy
-                game.players[id].last_update = player.get("last_update", 0)
-        
+            update_enemies(player, id, crr_time)
+
         # Player atual
         else:
             game.player.respawn_ts = player.get("respawn_ts")
-            if time() - player.get("respawn_ts", 0) < 0.5:
+            if crr_time - player.get("respawn_ts", 0) < 0.5:
                 game.player.pos = player["pos"]
 
     game.placar = data["placar"]
@@ -178,11 +167,30 @@ def update(data, addr):
     d = (t - game.last_pkg)
     game.pkg_ps = (1/d + game.pkg_ps)/2 if d else 1
     game.last_pkg = t
-    game.last_pkg = time()
-    ##############################
+
+def update_enemies(player, id, crr_time):
+    if id in game.players.keys():
+        game.players[id].pos = player["pos"]
+        game.players[id].run = player.get("run", 0)
+        game.players[id].dir = player.get("dir", False)
+        game.players[id].respawn_ts = player.get("respawn_ts", 0)
+        game.players[id].last_update = crr_time
+
+        if crr_time - player["respawn_ts"] < 1:
+            game.players[id].reset_name(player["name"])
+
+    # Caso o inimigo ainda não tenha sido instanciado
+    else:
+        enemy = Enemy(player["id"], player["name"])
+        enemy.pos = player["pos"]
+        enemy.texture = game.player_textures[id%2]
+        game.players[id] = enemy
+        game.players[id].last_update = player.get("last_update", 0)
+
 try:
     game.run()
 except Exception:
     traceback.print_exc()
+
 pg.quit()
 app.stop()
