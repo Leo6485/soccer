@@ -6,7 +6,6 @@ from net import Server
 from pygame import Vector2
 
 respawn_points = [Vector2(50, 50), Vector2(1316, 50), Vector2(50, 718), Vector2(1316, 718)]
-IDs = [False]*4
 
 class Ball:
     def __init__(self):
