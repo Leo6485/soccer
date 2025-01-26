@@ -34,40 +34,33 @@ class Cursor:
                 self.delta.x = 0
                 self.delta.y = 0
 
-        cursor_range = 10
+        cr = 10
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
-        if not (DW/cursor_range < self.last_cursor_pos.x < (cursor_range-1) * DW/cursor_range) or not (DH/cursor_range < self.last_cursor_pos.y < (cursor_range-1) * DH/cursor_range):
+        if not (DW/cr < self.last_cursor_pos.x < (cr-1) * DW/cr) or not (DH/cr < self.last_cursor_pos.y < (cr-1) * DH/cr):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
-
-    def draw(self, screen, player_pos):
-        pg.draw.circle(screen, (0, 255, 0), ((player_pos.x + self.pos.x), (player_pos.y + self.pos.y)), 4)
-        pg.draw.circle(screen, (0, 255, 0), ((player_pos.x + self.pos.x), (player_pos.y + self.pos.y)), 20, width=2)
 
 class Player:
     vel = 0.05
 
     def __init__(self, id, name):
-        self.cursor = Cursor()
         self.pos = pg.Vector2(100, 100)
         self.size = 25
-        self.id = id
-
-        self.name = name
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
-        
-        # Textura padrão, é alterada ao conectar e receber o id
-        self.texture = pg.image.load(f"assets/textures/player/pato1.png")
-        self.texture = pg.transform.scale(self.texture, (192, 128))
-        
-        # Variáveis utilizadas na conexão e afins
+        self.life = 100
         self.run = 0
         self.dir = 0
         self.attack_ts = 0
         self.last_attack = 0
         self.attack_target = None
         self.respawn_ts = 0
+        self.cursor = Cursor()
+        self.name = name
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
+        self.id = id
+        self.team = self.id % 2 + 1
         self.data = {"pos": [0, 0], "id": id}
+        self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
+        self.texture = pg.transform.scale(self.texture, (192, 128))
 
     def update(self, pressed, mouse_pressed, ball, players):
         self.cursor.update()
@@ -111,7 +104,7 @@ class Player:
                         self.attack_target = player.id
 
                 self.attack_ts = time()
-                self.last_attack = time()
+                self.last_attack = self.attack_ts
 
         
         self.update_data()
@@ -127,9 +120,22 @@ class Player:
                         "dir": self.dir,
                      }
 
+    def draw_progress_bar(self, screen, progress):
+        bar_width = 50
+        bar_height = 5
+        x = self.pos.x - bar_width / 2
+        y = self.pos.y + self.size + 10
+
+        # Draw the background bar (dark green)
+        pg.draw.rect(screen, (0, 100, 0), (x, y, bar_width, bar_height))
+
+        # Draw the progress bar (green)
+        pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
+
     def draw(self, screen):
         # Desenha o cursor
-        self.cursor.draw(screen, self.pos)
+        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 4)
+        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 20, width=2)
 
         frame_y = 64 if self.cursor.pos.x < 0 else 0
         frame_x = int((time() * 6) % 3) * 64
@@ -142,3 +148,7 @@ class Player:
         # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)
+
+        # Draw the progress bar
+        progress = min((time() - self.last_attack)/0.5, 1)
+        self.draw_progress_bar(screen, progress)

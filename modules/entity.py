@@ -49,7 +49,7 @@ class Ball:
         self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv
 
     def draw(self, screen):
-        texture_rect = self.texture.get_rect(center=self.interpolated_pos)
+        texture_rect = self.texture.get_rect(center=(self.interpolated_pos.x, self.interpolated_pos.y + 8))
         screen.blit(self.texture, texture_rect)
         # pg.draw.circle(screen, (255, 255, 255), self.pos, self.size, width=2)
 
