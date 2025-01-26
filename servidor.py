@@ -58,19 +58,35 @@ class Game:
     def __init__(self):
         self.players = {}
         self.ball = Ball()
-        self.clients = []
+        self.clients = {}
         self.display = Vector2(1366, 768)
         self.placar = [0, 0]
+        self.started = False
+    
+    def restart(self):
+        self.__init__(self)
+    
+    def get_free_id(self):
+        for i in range(4):
+            if not self.players.get(i):
+                return i
 
     def update(self):
+        crr_time = time()
+        to_delete = []
         for id, player in self.players.items():
+            ############################## Desconecta clientes inativos ##############################
+            if crr_time - player.get("last_update") > 1:
+                to_delete.append(id)
+                continue
+
             ############################## Ataque ##############################
             att_ts = player.get("attack_ts", 0)
             last_att = player.get("last_attack", 0)
             attack_target = player.get("attack_target", None)
 
             # Delay aceito e cooldown
-            if time() - att_ts < 0.5 and att_ts - last_att > 0.5:
+            if crr_time - att_ts < 0.5 and att_ts - last_att > 0.5:
                 if attack_target is not None:
                     target_player = self.players[attack_target]
                     target = target_player["pos"]
@@ -81,10 +97,14 @@ class Game:
                         id = target_player["id"]
                         pos = respawn_points[id]
                         self.players[id]["pos"] = pos   
-                        self.players[id]["respawn_ts"] = time()
+                        self.players[id]["respawn_ts"] = crr_time
 
-                player["last_attack"] = time()
+                player["last_attack"] = crr_time
         
+        for id in to_delete:
+            del self.clients[id]
+            del self.players[id]
+
         self.ball.update(self.players, self.display)
         ############################## Detecção dos gols ##############################
         gol = 0
@@ -98,11 +118,10 @@ class Game:
             self.ball.vel = Vector2(0, 0)
             self.placar[0] += 1
             gol = 1
-        
-        ts = time()
+
         if gol:
             for player in self.players.values():
-                player["respawn_ts"] = ts
+                player["respawn_ts"] = crr_time
                 player["pos"] = respawn_points[player["id"]]
 
         self.ball.pos += self.ball.vel
@@ -114,7 +133,8 @@ game = Game()
 
 @app.route("CONNECT")
 def connect(data, addr):
-    player_id = len(game.players)
+    crr_time = time()
+    player_id = game.get_free_id()
     player_data = {
         "addr": addr,
         "pos": respawn_points[player_id],
@@ -122,32 +142,41 @@ def connect(data, addr):
         "id": player_id,
         "attack_ts": 0,
         "last_attack": 0,
-        "respawn_ts": time()
+        "respawn_ts": crr_time,
+        "last_update": crr_time
     }
     game.players[player_id] = player_data
-    game.clients.append(addr)
-
+    game.clients[player_id] = addr
+    print(game.clients)
     print(f"Novo jogador conectado: {data}")
 
     return {"type": "ID", "data": {"id": player_id, "respawn_ts": time()}}
 
+@app.route("STARTGAME")
+def startgame(data, addr):
+    game.started = True
+
 @app.route("UPDATE")
 def update(data, addr):
+    crr_time = time()
     id = data["id"]
     player = game.players[id]
     
-    if time() - game.players[id].get("respawn_ts", 0) > 1.5:
+    if crr_time - game.players[id].get("respawn_ts", 0) > 1.5:
         player["pos"] = Vector2(data["pos"])
         player["attack_ts"] = data["attack_ts"]
         player["cursor_pos"] = Vector2(data["cursor_pos"])
         player["attack_target"] = data["attack_target"]
         player["run"] = data["run"]
         player["dir"] = data["dir"]
+        
+        # Variáveis setadas pelo servidor
+    player["last_update"] = crr_time
 
 @app.route("QUIT")
 def quit(data, addr):
     global game, app
-    for c in game.clients:
+    for c in game.clients.values():
         app.send({"type": "QUIT"}, c)
 
     game = Game()
@@ -160,7 +189,7 @@ print("/033c", end="\r")
 app.run(wait=False)
 
 def send_updates():
-    for c in game.clients:
+    for c in game.clients.values():
         app.send({
             "type": "UPDATE",
             "data": {
