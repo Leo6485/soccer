@@ -146,13 +146,13 @@ def update(data, addr):
         id = player["id"]
         if id != game.player.id:
             if id in game.players.keys():
-                game.players[id].pos = pg.Vector2(player["pos"])
+                game.players[id].pos = player["pos"]
                 game.players[id].run = player.get("run", 0)
                 game.players[id].dir = player.get("dir", False)
                 game.players[id].respawn_ts = player.get("respawn_ts", 0)
             else:
                 enemy = Enemy(player["id"], player["name"])
-                enemy.pos = pg.Vector2(player["pos"])
+                enemy.pos = player["pos"]
                 enemy.texture = game.player_textures[id%2]
                 
                 game.players[id] = enemy
@@ -160,7 +160,7 @@ def update(data, addr):
         else:
             game.player.respawn_ts = player.get("respawn_ts")
             if time() - player.get("respawn_ts", 0) < 0.5:
-                game.player.pos = pg.Vector2(player["pos"])
+                game.player.pos = player["pos"]
 
     game.placar = data["placar"]
 

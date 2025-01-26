@@ -5,12 +5,14 @@ from os import _exit
 from time import time
 import jsonbin
 from net import Server
+from pygame import Vector2
 
-respawn_points = [[50, 50], [1316, 50], [50, 718], [1316, 718]]
+respawn_points = [Vector2(50, 50), Vector2(1316, 50), Vector2(50, 718), Vector2(1316, 718)]
+
 class Ball:
     def __init__(self):
-        self.pos = [500, 500]
-        self.vel = [0, 0]
+        self.pos = Vector2(500, 500)
+        self.vel = Vector2(0, 0)
         self.size = 85
     
     def update(self, players, display):
@@ -26,38 +28,31 @@ class Ball:
         if distancia == 0:
             return
 
-        d[0] = (d[0]) / (distancia * 20)
-        d[1] = (d[1]) / (distancia * 20)
+        d /= distancia * 20
 
         if distancia < 110:
-            self.vel[0] -= d[0]
-            self.vel[1] -= d[1]
+            self.vel -= d
     
     def update_collision(self, display):
-        if self.pos[0] < self.size:
-            self.vel[0] *= -0.5
-            self.pos[0] = self.size
+        if self.pos.x < self.size:
+            self.vel.x *= -0.5
+            self.pos.x = self.size
 
-        if self.pos[1] < self.size:
-            self.vel[1] *= -0.5
-            self.pos[1] = self.size
+        if self.pos.y < self.size:
+            self.vel.y *= -0.5
+            self.pos.y = self.size
 
-        if self.pos[0] > display.x - self.size:
-            self.vel[0] *= -0.5
-            self.pos[0] = display.x - self.size
+        if self.pos.x > display.x - self.size:
+            self.vel.x *= -0.5
+            self.pos.x = display.x - self.size
 
-        if self.pos[1] > display.y - self.size:
-            self.vel[1] *= -0.5
-            self.pos[1] = display.y - self.size
+        if self.pos.y > display.y - self.size:
+            self.vel.y *= -0.5
+            self.pos.y = display.y - self.size
 
     def calc_dist(self, pos):
-        d = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
-        return d, sqrt(d[0]**2 + d[1]**2)
-
-class Vector2:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        d = pos - self.pos
+        return d, d.length()
 
 class Game:
     def __init__(self):
@@ -80,7 +75,7 @@ class Game:
                     target_player = self.players[attack_target]
                     target = target_player["pos"]
                     cursor = player["cursor_pos"]
-                    distancia = sqrt((target[0] - cursor[0])**2 + (target[1] - cursor[1])**2)
+                    distancia = (target - cursor).length()
                     if distancia < 50:
                         print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
                         id = target_player["id"]
@@ -93,29 +88,25 @@ class Game:
         self.ball.update(self.players, self.display)
         ############################## Detecção dos gols ##############################
         gol = 0
-        if self.ball.pos[0] < 150 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
-            self.ball.pos = [683, 382]
-            self.ball.vel = [0, 0]
+        if self.ball.pos.x < 150 and 200 < self.ball.pos.y < 568:
+            self.ball.pos = Vector2(683, 382)
+            self.ball.vel = Vector2(0, 0)
             self.placar[1] += 1
             gol = 1
-        if self.ball.pos[0] > 1216 and self.ball.pos[1] > 200 and self.ball.pos[1] < 568:
-            self.ball.pos = [683, 382]
-            self.ball.vel = [0, 0]
+        if self.ball.pos.x > 1216 and 200 < self.ball.pos.y < 568:
+            self.ball.pos = Vector2(683, 382)
+            self.ball.vel = Vector2(0, 0)
             self.placar[0] += 1
             gol = 1
         
         ts = time()
-        # print(self.players)
         if gol:
             for player in self.players.values():
                 player["respawn_ts"] = ts
                 player["pos"] = respawn_points[player["id"]]
 
-        self.ball.pos[0] += self.ball.vel[0]
-        self.ball.pos[1] += self.ball.vel[1]
-
-        self.ball.vel[0] *= 0.98
-        self.ball.vel[1] *= 0.98
+        self.ball.pos += self.ball.vel
+        self.ball.vel *= 0.98
 
 app = Server()
 jsonbin.set_ip(app.ip)
@@ -124,7 +115,15 @@ game = Game()
 @app.route("CONNECT")
 def connect(data, addr):
     player_id = len(game.players)
-    player_data = {"addr": addr, "pos": respawn_points[player_id], "name": data["name"], "id": player_id, "attack_ts": 0, "last_attack": 0, "respawn_ts": time()}
+    player_data = {
+        "addr": addr,
+        "pos": respawn_points[player_id],
+        "name": data["name"],
+        "id": player_id,
+        "attack_ts": 0,
+        "last_attack": 0,
+        "respawn_ts": time()
+    }
     game.players[player_id] = player_data
     game.clients.append(addr)
 
@@ -138,9 +137,9 @@ def update(data, addr):
     player = game.players[id]
     
     if time() - game.players[id].get("respawn_ts", 0) > 1.5:
-        player["pos"] = data["pos"]
+        player["pos"] = Vector2(data["pos"])
         player["attack_ts"] = data["attack_ts"]
-        player["cursor_pos"] = data["cursor_pos"]
+        player["cursor_pos"] = Vector2(data["cursor_pos"])
         player["attack_target"] = data["attack_target"]
         player["run"] = data["run"]
         player["dir"] = data["dir"]
@@ -162,7 +161,14 @@ app.run(wait=False)
 
 def send_updates():
     for c in game.clients:
-        app.send({"type": "UPDATE", "data": {"ball": [round(i, 2) for i in game.ball.pos], "players": game.players, "placar": game.placar}}, c)
+        app.send({
+            "type": "UPDATE",
+            "data": {
+                "ball": [round(i, 2) for i in game.ball.pos],
+                "players": game.players,
+                "placar": game.placar
+            }
+        }, c)
 
 while True:
     try:
@@ -170,6 +176,6 @@ while True:
         send_updates()
         sleep(1/120)
     except KeyboardInterrupt:
-            break
+        break
 
 app.stop()
