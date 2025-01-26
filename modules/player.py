@@ -16,20 +16,17 @@ class Cursor:
 
     def update(self):
         mouse_pos = pg.Vector2(pg.mouse.get_pos())
-        dx = self.pos.x + mouse_pos.x - self.last_cursor_pos.x
-        dy = self.pos.y + mouse_pos.y - self.last_cursor_pos.y
-        dist = sqrt(dx**2 + dy**2)
+        d = self.pos + mouse_pos - self.last_cursor_pos
+        dist = d.length()
 
         if self.limit < dist < self.limit + max(DW, DH):
-            self.pos.x = dx / (dist / 100)
-            self.pos.y = dy / (dist / 100)
+            self.pos = d / (dist / 100)
             self.delta = self.pos.copy()
         elif dist <= self.limit:
-            self.pos.x = dx
-            self.pos.y = dy
+            self.pos = d
+
             if dist:
-                self.delta.x = dx / (dist / 100)
-                self.delta.y = dy / (dist / 100)
+                self.delta = d / (dist / 100)
             else:
                 self.delta.x = 0
                 self.delta.y = 0
