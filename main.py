@@ -23,20 +23,23 @@ name = input("Insira seu nome: ")
 
 class Game:
     def __init__(self, app, name):
-        self.screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
         self.app = app
+        
+        # Tela
+        self.screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
+        self.scale = min(DW / 1920, DH / 1080)
+        self.padding = ((DW - 1920 * self.scale) / 2, (DH - 1080 * self.scale) / 2)
+        
+        # Variáveis do jogo
         self.placar = [0, 0]
-
         self.player = Player(-1, name)
         self.players = {}
-
+        self.ball = Ball()
+        
+        # Primeira conexão
         data = {"type": "CONNECT", "data": {"name": self.player.name}}
         self.app.send(data)
 
-        self.ball = Ball()
-
-        self.scale = min(DW / 1920, DH / 1080)
-        self.padding = ((DW - 1920 * self.scale) / 2, (DH - 1080 * self.scale) / 2)
         self.running = True
         
         # Texturas
