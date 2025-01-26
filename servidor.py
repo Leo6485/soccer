@@ -1,7 +1,7 @@
 from time import sleep
 from os import _exit
 from time import time
-import jsonbin
+import modules.jsonbin as jsonbin
 from net import Server
 from pygame import Vector2
 
