@@ -144,6 +144,7 @@ def id(data, addr):
 
 @app.route("update")
 def update(data, addr):
+    crr_time = time()
     game.ball.pos = pg.Vector2(data["ball"])
     for player in data["players"].values():
         id = player["id"]
@@ -155,12 +156,14 @@ def update(data, addr):
                 game.players[id].run = player.get("run", 0)
                 game.players[id].dir = player.get("dir", False)
                 game.players[id].respawn_ts = player.get("respawn_ts", 0)
+                game.players[id].last_update = crr_time
             # Caso o inimigo ainda não tenha sido instanciado
             else:
                 enemy = Enemy(player["id"], player["name"])
                 enemy.pos = player["pos"]
                 enemy.texture = game.player_textures[id%2]
                 game.players[id] = enemy
+                game.players[id].last_update = crr_time
         
         # Player atual
         else:

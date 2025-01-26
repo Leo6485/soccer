@@ -17,9 +17,14 @@ class Enemy():
         self.respawn_ts = 0
         self.run = 0
         self.dir = 0
+        self.last_update = time()
     
     def update(self):
-        if time() - self.respawn_ts < 1.5:
+        crr_time = time()
+        if crr_time - self.last_update > 1:
+            self.pos = pg.Vector2(-10000, -10000)
+
+        if crr_time - self.respawn_ts < 1.5:
             self.interpolated_pos = self.pos
         else:
             self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv

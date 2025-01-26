@@ -192,8 +192,9 @@ print("/033c", end="\r")
 app.run(wait=False)
 
 def send_updates():
-    # Evita a alteração dos clients durante a iteração
-    clients = game.clients.values()
+    # Evita a mudança do dict durante a iteração
+    clients = tuple(game.clients.values())
+
     for c in clients:
         app.send({
             "type": "UPDATE",
