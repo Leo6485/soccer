@@ -39,6 +39,10 @@ class Cursor:
         if not (DW/cr < self.last_cursor_pos.x < (cr-1) * DW/cr) or not (DH/cr < self.last_cursor_pos.y < (cr-1) * DH/cr):
             pg.mouse.set_pos(DW / 2, DH / 2)
             self.last_cursor_pos = pg.Vector2(DW / 2, DH / 2)
+    
+    def draw(self, screen, player_pos):
+        pg.draw.circle(screen, (0, 255, 0), (player_pos + self.pos), 4)
+        pg.draw.circle(screen, (0, 255, 0), (player_pos + self.pos), 20, width=2)
 
 class Player:
     vel = 0.05
@@ -106,7 +110,6 @@ class Player:
                 self.attack_ts = time()
                 self.last_attack = self.attack_ts
 
-        
         self.update_data()
 
     def update_data(self):
@@ -126,29 +129,24 @@ class Player:
         x = self.pos.x - bar_width / 2
         y = self.pos.y + self.size + 10
 
-        # Draw the background bar (dark green)
         pg.draw.rect(screen, (0, 100, 0), (x, y, bar_width, bar_height))
-
-        # Draw the progress bar (green)
         pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
 
     def draw(self, screen):
-        # Desenha o cursor
-        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 4)
-        pg.draw.circle(screen, (0, 255, 0), ((self.pos.x + self.cursor.pos.x), (self.pos.y + self.cursor.pos.y)), 20, width=2)
+        self.cursor.draw(screen, self.pos)
 
         frame_y = 64 if self.cursor.pos.x < 0 else 0
-        frame_x = int((time() * 6) % 3) * 64
-        
-        frame_x = frame_x if self.run else 128
+        frame_x = int((time() * 6) % 3) * 64 if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
         screen.blit(self.texture, (self.pos.x-32, self.pos.y-42), texture_rect)
 
         # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
+
+        # Desenha o nome do player
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)
 
-        # Draw the progress bar
+        # Desenha a barra de cooldown
         progress = min((time() - self.last_attack)/0.5, 1)
         self.draw_progress_bar(screen, progress)

@@ -26,10 +26,13 @@ class Game:
         self.app = app
         
         # Tela
-        self.screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
-        self.scale = min(DW / 1920, DH / 1080)
-        self.padding = ((DW - 1920 * self.scale) / 2, (DH - 1080 * self.scale) / 2)
-        
+        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+
+        # Display design (ainda não utilizado)
+        self.DD = pg.Vector2(1920, 1080)
+        self.scale = min(DW / self.DD.x, DH / self.DD.y)
+        self.padding = pg.Vector2((DW - self.DD.x * self.scale) / 2, (DH - self.DD.y * self.scale) / 2)
+
         # Variáveis do jogo
         self.placar = [0, 0]
         self.player = Player(-1, name)
@@ -53,8 +56,8 @@ class Game:
         # Debug
         self.debug_font = pg.font.Font(None, 15)
         self.last_pkg = 0
-        self.pkg_time = 1
-        self.update_time = 0
+        self.pkg_ps = 1
+        self.update_time = 1
 
     def update(self):
         for e in pg.event.get():
@@ -108,8 +111,8 @@ class Game:
         self.debug(f"Ball: {self.ball.pos}", 1)
         self.debug(f"Placar: {self.placar}", 2)
         self.debug(f"FPS: {self.clock.get_fps():.2f}", 3)
-        self.debug(f"PKG time: {self.pkg_time:.4f}", 4)
-        self.debug(f"Update time: {self.update_time:.4f}", 5)
+        self.debug(f"PKG/s: {self.pkg_ps:.4f}", 4)
+        self.debug(f"Update PS: {(1/self.update_time):.2f}", 5)
         pg.display.flip()
 
     def debug(self, text, offset):
@@ -167,7 +170,7 @@ def update(data, addr):
     # Debug
     t = time()
     d = (t - game.last_pkg)
-    game.pkg_time = (1/d + game.pkg_time)/2 if d else 1
+    game.pkg_ps = (1/d + game.pkg_ps)/2 if d else 1
     game.last_pkg = t
     game.last_pkg = time()
     ##############################
