@@ -13,21 +13,21 @@ class Ball:
         self.vel = Vector2(0, 0)
         self.size = 85
     
-    def update(self, players, display, IDs):
+    def update(self, players, display, IDs, delta_time):
         for id, player in players.items():
             if IDs[id]:
-                self.update_move(player)
+                self.update_move(player, delta_time)
 
         self.update_collision(display)
     
-    def update_move(self, player):
+    def update_move(self, player, delta_time):
         d, distancia = self.calc_dist(player["pos"])
         
         # Evita a divisão por 0
         if distancia == 0:
             return
 
-        d /= distancia * 20
+        d /= distancia * 1200 * delta_time
 
         if distancia < 110:
             self.vel -= d
@@ -76,7 +76,7 @@ class Game:
         except ValueError:
             return None
 
-    def update(self):
+    def update(self, delta_time):
         crr_time = time()
 
         for id, player in self.players.items():
@@ -112,7 +112,7 @@ class Game:
 
                 player["last_attack"] = crr_time
 
-        self.ball.update(self.players, self.display, self.IDs)
+        self.ball.update(self.players, self.display, self.IDs, delta_time)
         ############################## Detecção dos gols ##############################
         gol = 0
         if self.ball.pos.x < 150 and 200 < self.ball.pos.y < 568:
@@ -213,11 +213,15 @@ def send_updates():
         if game.IDs[id]:
             app.send(data, c)
 
+delta_time = 1/60
 while True:
     try:
-        game.update()
+        start = time()
+        game.update(delta_time)
         send_updates()
         sleep(1/120)
+        end = time()
+        delta_time = end - start
     except KeyboardInterrupt:
         break
 
