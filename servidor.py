@@ -64,7 +64,8 @@ class Game:
         self.started = False
     
     def restart(self):
-        self.__init__(self)
+        print("Reiniciando o servidor")
+        self.__init__()
     
     def get_free_id(self):
         try:
@@ -77,11 +78,16 @@ class Game:
 
     def update(self):
         crr_time = time()
-        to_delete = []
+
         for id, player in self.players.items():
             ############################## Desconecta clientes inativos ##############################
             if crr_time - player.get("last_update") > 1:
                 self.IDs[id] = False
+                
+                # Reinicia o servidor caso todos os jogadores tenham saído
+                if not any(self.IDs):
+                    self.restart()
+                    return
 
             ############################## Ataque ##############################
             att_ts = player.get("attack_ts", 0)
