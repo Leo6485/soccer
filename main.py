@@ -5,6 +5,7 @@ from modules.net import Client
 from modules.entity import Enemy, Ball
 from modules.player import Player
 import traceback
+from os import _exit
 
 pg.init()
 pg.mouse.set_visible(0)
@@ -189,6 +190,10 @@ def update_enemies(player, id, crr_time):
 
 try:
     game.run()
+except KeyboardInterrupt:
+    app.stop()
+    _exit(0)
+
 except Exception:
     traceback.print_exc()
 
