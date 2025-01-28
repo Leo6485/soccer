@@ -55,6 +55,7 @@ class Ball:
 
 class Game:
     def __init__(self):
+        self.crr_screen = "mainmenu"
         self.players = {}
         self.ball = Ball()
         self.clients = {}
@@ -81,7 +82,7 @@ class Game:
 
         for id, player in self.players.items():
             ############################## Desconecta clientes inativos ##############################
-            if crr_time - player.get("last_update") > 1:
+            if crr_time - player.get("last_update") > 1.5:
                 self.IDs[id] = False
                 
                 # Reinicia o servidor caso todos os jogadores tenham saído
@@ -138,6 +139,13 @@ app = Server()
 jsonbin.set_ip(app.ip)
 game = Game()
 
+@app.route("STARTGAME")
+def start_game(data, addr):
+    print("Trocando de tela")
+    game.crr_screen = "ingame"
+    for e_id, c in game.clients.items():
+        app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}}, c)
+
 @app.route("CONNECT")
 def connect(data, addr):
     crr_time = time()
@@ -162,10 +170,6 @@ def connect(data, addr):
     print(f"Novo jogador conectado: {data}")
 
     return {"type": "ID", "data": {"id": player_id, "respawn_ts": time()}}
-
-@app.route("STARTGAME")
-def startgame(data, addr):
-    game.started = True
 
 @app.route("UPDATE")
 def update(data, addr):

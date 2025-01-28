@@ -21,7 +21,7 @@ BACKGROUND_COLOR = (0, 0, 0)
 class Game:
     def __init__(self, app, name):
         self.app = app
-        
+        self.crr_screen = "mainmenu"
         # Tela
         self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 
@@ -122,12 +122,18 @@ class Game:
     def run(self):
         self.clock = pg.time.Clock()
         while self.running:
-            start_time = time()
-            self.update()
-            self.draw()
-            end_time = time()
-            self.update_time = end_time - start_time
-            self.clock.tick(60)
+            print("OK")
+            while self.crr_screen == "mainmenu":
+                print("AAAAAAAAAAAAAA")
+                self.app.send({"type": "startgame", "data": {}})
+
+            while self.crr_screen == "ingame":
+                start_time = time()
+                self.update()
+                self.draw()
+                end_time = time()
+                self.update_time = end_time - start_time
+                self.clock.tick(60)
 
 server_ip = jsonbin.get_ip()
 app = Client(server_ip=server_ip)
@@ -136,6 +142,11 @@ name = input("Insira seu nome: ")
 game = Game(app, name)
 
 app.run(wait=False)
+
+@app.route("SETSCREEN")
+def set_screen(data, addr):
+    print("Trocando de tela para", data["crr_screen"])
+    game.crr_screen = data["crr_screen"]
 
 @app.route("id")
 def id(data, addr):
