@@ -4,6 +4,19 @@ from time import time
 import modules.jsonbin as jsonbin
 from modules.net import Server
 from pygame import Vector2
+from threading import Lock
+
+class GamePlayer:
+    def __init__(self):
+        self.timestamps = {}
+        self.data = {}
+        self.lock = Lock()
+    
+    def get(self):
+        with self.lock:
+            data = self.data.copy()
+        
+        return data
 
 respawn_points = [Vector2(50, 50), Vector2(1316, 50), Vector2(50, 718), Vector2(1316, 718)]
 
@@ -139,11 +152,19 @@ app = Server()
 jsonbin.set_ip(app.ip)
 game = Game()
 
-@app.route("STARTGAME")
-def start_game(data, addr):
-    print("Trocando de tela")
-    game.crr_screen = "ingame"
-    for e_id, c in game.clients.items():
+# @app.route("STARTGAME")
+# def start_game(data, addr):
+#     print("Trocando de tela")
+#     game.crr_screen = "ingame"
+#     for e_id, c in game.clients.items():
+#         app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}}, c)
+
+@app.route("SETSCREEN")
+def set_screen(data, addr):
+    if game.crr_screen != data["crr_screen"]:
+        print(f"Alterando tela para {data['crr_screen']}")
+    game.crr_screen = data["crr_screen"]
+    for _, c in game.clients.items():
         app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}}, c)
 
 @app.route("CONNECT")

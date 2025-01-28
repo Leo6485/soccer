@@ -6,6 +6,7 @@ from modules.entity import Enemy, Ball
 from modules.player import Player
 import traceback
 from os import _exit
+from threading import Lock
 
 pg.init()
 pg.mouse.set_visible(0)
@@ -122,12 +123,10 @@ class Game:
     def run(self):
         self.clock = pg.time.Clock()
         while self.running:
-            print("OK")
-            while self.crr_screen == "mainmenu":
-                print("AAAAAAAAAAAAAA")
-                self.app.send({"type": "startgame", "data": {}})
+            while self.crr_screen == "mainmenu" and self.running:
+                self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}})
 
-            while self.crr_screen == "ingame":
+            while self.crr_screen == "ingame" and self.running:
                 start_time = time()
                 self.update()
                 self.draw()
