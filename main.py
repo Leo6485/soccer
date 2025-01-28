@@ -142,11 +142,6 @@ game = Game(app, name)
 
 app.run(wait=False)
 
-@app.route("SETSCREEN")
-def set_screen(data, addr):
-    print("Trocando de tela para", data["crr_screen"])
-    game.crr_screen = data["crr_screen"]
-
 @app.route("id")
 def id(data, addr):
     game.player.id = data["id"]
@@ -172,12 +167,14 @@ def update(data, addr):
                 game.player.pos = player["pos"]
 
     game.placar = data["placar"]
+    game.crr_screen = data["crr_screen"]
 
     # Debug
     t = time()
     d = (t - game.last_pkg)
     game.pkg_ps = (1/d + game.pkg_ps)/2 if d else 1
     game.last_pkg = t
+
 
 def update_enemies(player, id, crr_time):
     if id in game.players.keys():

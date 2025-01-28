@@ -152,20 +152,11 @@ app = Server()
 jsonbin.set_ip(app.ip)
 game = Game()
 
-# @app.route("STARTGAME")
-# def start_game(data, addr):
-#     print("Trocando de tela")
-#     game.crr_screen = "ingame"
-#     for e_id, c in game.clients.items():
-#         app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}}, c)
-
 @app.route("SETSCREEN")
 def set_screen(data, addr):
     if game.crr_screen != data["crr_screen"]:
         print(f"Alterando tela para {data['crr_screen']}")
     game.crr_screen = data["crr_screen"]
-    for _, c in game.clients.items():
-        app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}}, c)
 
 @app.route("CONNECT")
 def connect(data, addr):
@@ -228,12 +219,14 @@ def send_updates():
     data = {
             "type": "UPDATE",
             "data": {
+                "crr_screen": game.crr_screen,
                 "ball": [round(i, 2) for i in game.ball.pos],
                 "players": game.players,
                 "IDs": game.IDs,
                 "placar": game.placar
             }
         }
+
     for id, c in game.clients.items():
         if game.IDs[id]:
             app.send(data, c)
