@@ -95,7 +95,7 @@ class Game:
 
         for id, player in self.players.items():
             ############################## Desconecta clientes inativos ##############################
-            if crr_time - player.get("last_update") > 1.5:
+            if crr_time - player.get("last_update") > 0.5:
                 self.IDs[id] = False
                 
                 # Reinicia o servidor caso todos os jogadores tenham saído
@@ -163,8 +163,8 @@ def connect(data, addr):
     crr_time = time()
 
     player_id = game.get_free_id()
-    if player_id is None:
-        return
+    if player_id is None or game.crr_screen == "ingame":
+        return {"type": "servermsg", "data": {"text": "O servidor está lotado ou em partida", "error": 1}}
 
     player_data = {
         "addr": addr,
@@ -196,7 +196,8 @@ def update(data, addr):
         player["attack_target"] = data["attack_target"]
         player["run"] = data["run"]
         player["dir"] = data["dir"]
-        
+        player["name"] = data["name"]
+
         # Variáveis setadas pelo servidor
     player["last_update"] = crr_time
 
@@ -211,6 +212,11 @@ def quit(data, addr):
     _exit(0)
     
     print("Reiniciando o servidor...")
+
+# Rota para manter a conexão ativa sem definir um update
+@app.route("PING")
+def ping(data, addr):
+    game.players[data["id"]]["last_update"] = time()
 
 print("/033c", end="\r")
 app.run(wait=False)

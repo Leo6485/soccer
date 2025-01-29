@@ -115,6 +115,7 @@ class Player:
                         "attack_target": self.attack_target,
                         "run": self.run,
                         "dir": self.dir,
+                        "name": self.name
                      }
 
     def draw_progress_bar(self, screen, progress):
@@ -144,3 +145,7 @@ class Player:
         # Desenha a barra de cooldown
         progress = min((time() - self.last_attack)/0.5, 1)
         self.draw_progress_bar(screen, progress)
+
+    def reset_name(self, name):
+        self.name = name
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))

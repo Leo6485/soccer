@@ -1,0 +1,64 @@
+import pygame as pg
+
+class Game:
+    def __init__(self, app, game_manager):
+        self.app = app
+        self.manager = game_manager
+
+        self.players = self.manager.players
+        self.IDs = self.manager.IDs
+        self.player = self.manager.player
+        self.ball = self.manager.ball
+        self.screen = self.manager.screen
+
+        self.clock = pg.time.Clock()
+        self.font = pg.font.SysFont("Arial", 24)
+
+    def update(self):
+        for e in pg.event.get():
+            if e.type == pg.QUIT:
+                self.manager.running = False
+
+        pressed = pg.key.get_pressed()
+        mouse_pressed = pg.mouse.get_pressed()
+
+        if pressed[pg.K_q]:
+            self.manager.running = False
+        
+        self.ball.update()
+        for id, p in self.players.items():
+            if id != self.player.id and self.IDs[id]:
+                p.update()
+
+        self.player.update(pressed, mouse_pressed, self.ball, self.players, self.IDs)
+        self.send_updates()
+
+    def send_updates(self):
+        player_data = {
+            "type": "update",
+            "data": self.manager.player.data
+        }
+        if self.player.id != -1:
+            self.app.send(player_data)
+
+    def draw(self):
+        # Gols
+        pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
+        pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
+
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(self.manager.map_texture, (0, 0))
+        self.ball.draw(self.screen)
+
+        for id, p in self.players.items():
+            if id != self.player.id and self.IDs[id]:
+                p.draw(self.screen)
+
+        self.player.draw(self.screen)
+
+        # Exibir FPS
+        fps_text = self.font.render(f"FPS: {self.clock.get_fps():.1f}", True, (0, 0, 255))
+        self.screen.blit(fps_text, (10, 10))
+
+        pg.display.flip()
+        self.clock.tick(60)
