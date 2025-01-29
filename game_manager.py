@@ -52,7 +52,6 @@ class GameManager:
             while self.crr_screen == "mainmenu" and self.running:
                 self.main_menu.update()
                 self.main_menu.draw()
-                # self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame"}})
             pg.mouse.set_visible(0)
             while self.crr_screen == "ingame" and self.running:
                 
@@ -82,6 +81,8 @@ class GameManager:
             enemy.respawn_ts = player.get("respawn_ts", 0)
             enemy.last_update = crr_time
             if crr_time - enemy.respawn_ts < 1:
+                enemy.reset_name(player["name"])
+            if enemy.name != player["name"]:
                 enemy.reset_name(player["name"])
         else:
             enemy = Enemy(id, player["name"])

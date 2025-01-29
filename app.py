@@ -6,7 +6,7 @@ from game_manager import GameManager
 import pygame as pg
 from time import time
 
-# Inicia as rotas do cliente
+# Inicia as rotas do cliente e o game manager
 class App:
     def __init__(self):
         self.server_ip = get_ip()

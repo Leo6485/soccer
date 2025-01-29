@@ -163,8 +163,11 @@ def connect(data, addr):
     crr_time = time()
 
     player_id = game.get_free_id()
-    if player_id is None or game.crr_screen == "ingame":
-        return {"type": "servermsg", "data": {"text": "O servidor está lotado ou em partida", "error": 1}}
+    if player_id is None:
+        return {"type": "servermsg", "data": {"text": "O servidor está lotado", "error": 1}}
+    if game.crr_screen == "ingame":
+        game.IDs[player_id] = False
+        return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
 
     player_data = {
         "addr": addr,
@@ -178,7 +181,6 @@ def connect(data, addr):
     }
     game.players[player_id] = player_data
     game.clients[player_id] = addr
-    print(game.clients)
     print(f"Novo jogador conectado: {data}")
 
     return {"type": "ID", "data": {"id": player_id, "respawn_ts": time()}}
@@ -216,7 +218,8 @@ def quit(data, addr):
 # Rota para manter a conexão ativa sem definir um update
 @app.route("PING")
 def ping(data, addr):
-    game.players[data["id"]]["last_update"] = time()
+    if game.crr_screen == "mainmenu":
+        game.players[data["id"]]["last_update"] = time()
 
 print("/033c", end="\r")
 app.run(wait=False)
