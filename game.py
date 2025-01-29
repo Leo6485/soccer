@@ -42,12 +42,13 @@ class Game:
             self.app.send(player_data)
 
     def draw(self):
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(self.manager.map_texture, (0, 0))
+        
         # Gols
         pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
         pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
 
-        self.screen.fill((0, 0, 0))
-        self.screen.blit(self.manager.map_texture, (0, 0))
         self.ball.draw(self.screen)
 
         for id, p in self.players.items():
