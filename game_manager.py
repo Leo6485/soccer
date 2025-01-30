@@ -21,7 +21,7 @@ class GameManager:
         self.players = {}
         self.ball = Ball()
         self.running = True
-        
+
         self.final_screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
         self.screen = pg.Surface((1366, 768))
         self.map_texture = self.load_map_texture()
