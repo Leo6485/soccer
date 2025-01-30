@@ -97,7 +97,6 @@ class Game:
             ############################## Desconecta clientes inativos ##############################
             if crr_time - player.get("last_update") > 0.5:
                 self.IDs[id] = False
-                _exit(0)
                 
                 # Reinicia o servidor caso todos os jogadores tenham saído
                 if not any(self.IDs):
