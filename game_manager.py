@@ -12,18 +12,18 @@ del d
 
 class GameManager:
     def __init__(self, app, name):
+        self.DD = pg.Vector2(1366, 768)
+        self.scale = min(DW / self.DD.x, DH / self.DD.y)
+        self.padding = pg.Vector2((DW - self.DD.x * self.scale) / 2, (DH - self.DD.y * self.scale) / 2)
+
         self.app = app
         self.crr_screen = "mainmenu"
         self.IDs = [False]*4
         self.placar = [0, 0]
         self.player = Player(-1, name)
         self.players = {}
-        self.ball = Ball()
+        self.ball = Ball(self.scale)
         self.running = True
-
-        self.DD = pg.Vector2(1366, 768)
-        self.scale = min(DW / self.DD.x, DH / self.DD.y)
-        self.padding = pg.Vector2((DW - self.DD.x * self.scale) / 2, (DH - self.DD.y * self.scale) / 2)
 
         self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
         self.map_texture = self.load_map_texture()
@@ -43,7 +43,7 @@ class GameManager:
     def load_player_textures(self):
         texture_path = "assets/textures/player"
         textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
-        return [pg.transform.scale(texture, (192, 128)) for texture in textures]
+        return [pg.transform.scale(texture, (192*self.scale, 128*self.scale)) for texture in textures]
 
     def run(self):
         self.clock = pg.time.Clock()

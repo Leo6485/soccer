@@ -43,14 +43,14 @@ class Enemy():
         screen.blit(self.texture, (int(self.interpolated_pos.x - 32), int(self.interpolated_pos.y - 42)), texture_rect)
 
 class Ball:
-    def __init__(self):
+    def __init__(self, scale):
         self.size = 80
         self.pos = pg.Vector2(100, 100)
         self.interpolated_pos = pg.Vector2(100, 100)
         self.interpolation_lv = 2
 
         self.texture = pg.image.load("assets/textures/disc/disc.png")
-        self.texture = pg.transform.scale(self.texture, (self.size * 4.5, self.size * 4.5))
+        self.texture = pg.transform.scale(self.texture, (self.size * 4.5 * scale, self.size * 4.5 * scale))
     
     def update(self):
         self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv

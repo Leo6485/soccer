@@ -131,11 +131,11 @@ class Player:
         scaled_pos = self.pos * scale + padding
         self.cursor.draw(screen, scaled_pos)
 
-        frame_y = 64 if self.cursor.pos.x < 0 else 0
-        frame_x = int((time() * 6) % 3) * 64 if self.run else 128
+        frame_y = (64 if self.cursor.pos.x < 0 else 0) * scale
+        frame_x = (int((time() * 6) % 3) * 64 if self.run else 128) * scale
 
-        texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (int(self.pos.x - 32), int(self.pos.y - 42)), texture_rect)
+        texture_rect = pg.Rect(frame_x, frame_y, 64*scale, 64*scale)
+        screen.blit(self.texture, (int(scaled_pos.x - 32 * scale), int(scaled_pos.y - 42 * scale)), texture_rect)
 
         text_rect = self.name_text.get_rect(center=(int(scaled_pos.x), int(scaled_pos.y - self.size * scale - 10)))
         screen.blit(self.name_text, text_rect)
