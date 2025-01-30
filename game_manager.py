@@ -20,8 +20,9 @@ class GameManager:
         self.players = {}
         self.ball = Ball()
         self.running = True
-
-        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+        
+        self.final_screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+        self.screen = pg.Surface((1366, 768))
         self.map_texture = self.load_map_texture()
         self.player_textures = self.load_player_textures()
 
@@ -35,10 +36,15 @@ class GameManager:
         self.app.send(data)
         self.game = Game(self.app, self)
         self.main_menu = MainMenu(self.app, self)
+    
+    def flip(self):
+        frame = pg.transform.scale(self.screen, (DW, DH))
+        self.final_screen.blit(frame, (0, 0))
+        pg.display.flip()
 
     def load_map_texture(self):
         map_texture = pg.image.load("assets/textures/map/campo.png").convert()
-        return pg.transform.scale(map_texture, (DW, DH))
+        return pg.transform.scale(map_texture, (1366, 768))
 
     def load_player_textures(self):
         texture_path = "assets/textures/player"

@@ -13,7 +13,7 @@ class Game:
 
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont("Arial", 24)
-        self.score_font = pg.font.SysFont("Arial", 32)
+        self.score_font = pg.font.SysFont("Arial", 64)
 
     def update(self):
         for e in pg.event.get():
@@ -64,9 +64,10 @@ class Game:
         # Exibir FPS
         fps_text = self.font.render(f"FPS: {self.clock.get_fps():.1f}", True, (0, 0, 255))
         self.screen.blit(fps_text, (10, 10))
-
-        pg.display.flip()
-        self.clock.tick(200)
+        
+        # pg.display.flip()
+        self.manager.flip()
+        self.clock.tick(60)
 
     def draw_score(self):
         score_text = f"{self.manager.placar[0]}   {self.manager.placar[1]}"

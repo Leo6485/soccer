@@ -54,5 +54,6 @@ class MainMenu:
         pg.draw.rect(self.screen, (0, 255, 0), self.start_button, border_radius=10)
         start_button_text = self.font.render("Jogar", True, (255, 255, 255))
         self.screen.blit(start_button_text, (self.screen.get_width() / 2 - start_button_text.get_width() / 2, self.screen.get_height() / 2))
-
-        pg.display.flip()
+        
+        # pg.display.flip()
+        self.manager.flip()
