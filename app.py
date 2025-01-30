@@ -33,6 +33,7 @@ class App:
         def id(data, addr):
             self.game_manager.player.id = data["id"]
             self.game_manager.player.texture = self.game_manager.player_textures[data["id"] % 2]
+            self.game_manager.player.weapon.texture = self.game_manager.weapon_textures[data["id"] % 2]
             self.game_manager.players[data["id"]] = self.game_manager.player
             self.game_manager.player.team = self.game_manager.player.id % 2 + 1
 

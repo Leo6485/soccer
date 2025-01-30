@@ -3,6 +3,7 @@ from game import Game
 from main_menu import MainMenu
 from modules.player import Player
 from modules.entity import Ball, Enemy
+from modules.weapon import Weapon
 
 pg.init()
 pg.mouse.set_visible(1)
@@ -25,6 +26,7 @@ class GameManager:
         self.screen = pg.Surface((1366, 768))
         self.map_texture = self.load_map_texture()
         self.player_textures = self.load_player_textures()
+        self.weapon_textures = self.load_weapon_textures()
 
         self.DD = pg.Vector2(1366, 768)
         self.scale = min(DW / self.DD.x, DH / self.DD.y)
@@ -50,6 +52,11 @@ class GameManager:
         texture_path = "assets/textures/player"
         textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 128)) for texture in textures]
+    
+    def load_weapon_textures(self):
+        path = "assets/textures/player"
+        textures = [pg.image.load(path + "/shotgun1.png").convert_alpha(), pg.image.load(path + "/shotgun2.png").convert_alpha()]
+        return [pg.transform.scale(texture, (192, 64)) for texture in textures]
 
     def run(self):
         self.clock = pg.time.Clock()
@@ -82,10 +89,12 @@ class GameManager:
         if id in self.players:
             enemy = self.players[id]
             enemy.pos = player["pos"]
+            enemy.cursor_pos = player.get("cursor_pos", pg.Vector2(0, 0))
             enemy.run = player.get("run", 0)
             enemy.dir = player.get("dir", False)
             enemy.respawn_ts = player.get("respawn_ts", 0)
             enemy.last_update = crr_time
+            enemy.attack_ts = player["attack_ts"]
             if crr_time - enemy.respawn_ts < 1:
                 enemy.reset_name(player["name"])
             if enemy.name != player["name"]:
@@ -93,6 +102,7 @@ class GameManager:
         else:
             enemy = Enemy(id, player["name"])
             enemy.pos = player["pos"]
-            enemy.texture = self.player_textures[id % len(self.player_textures)]
+            enemy.texture = self.player_textures[id % 2]
+            enemy.weapon.texture = self.weapon_textures[id % 2]
             enemy.last_update = crr_time
             self.players[id] = enemy

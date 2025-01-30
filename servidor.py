@@ -191,10 +191,10 @@ def update(data, addr):
     id = data["id"]
     player = game.players[id]
     
+    player["cursor_pos"] = Vector2(data["cursor_pos"])
     if crr_time - game.players[id].get("respawn_ts", 0) > 1.5:
         player["pos"] = Vector2(data["pos"])
         player["attack_ts"] = data["attack_ts"]
-        player["cursor_pos"] = Vector2(data["cursor_pos"])
         player["attack_target"] = data["attack_target"]
         player["run"] = data["run"]
         player["dir"] = data["dir"]

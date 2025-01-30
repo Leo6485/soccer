@@ -1,5 +1,6 @@
 import pygame as pg
 from time import time
+from modules.weapon import Weapon
 
 pg.init()
 d = pg.display.Info()
@@ -61,6 +62,8 @@ class Player:
         self.data = {"pos": [0, 0], "id": id}
         self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
         self.texture = pg.transform.scale(self.texture, (192, 128))
+        
+        self.weapon = Weapon()
 
     def update(self, pressed, mouse_pressed, ball, players, IDs):
         self.cursor.update()
@@ -137,7 +140,7 @@ class Player:
         screen.blit(self.texture, (self.pos.x-32, self.pos.y-42), texture_rect)
 
         # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
-
+        self.weapon.draw(screen, self.pos, self.id, self.cursor.pos, self.attack_ts)
         # Desenha o nome do player
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)

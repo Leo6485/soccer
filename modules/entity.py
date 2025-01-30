@@ -1,6 +1,7 @@
 import pygame as pg
 from math import sqrt
 from time import time
+from modules.weapon import Weapon
 
 class Enemy():
     def __init__(self, id, name):
@@ -8,6 +9,7 @@ class Enemy():
         self.team = self.id%2 + 1
         self.size = 25
         self.pos = pg.Vector2(0, 0)
+        self.cursor_pos = pg.Vector2(0, 0)
         self.interpolated_pos = pg.Vector2(0, 0)
         self.interpolation_lv = 2
 
@@ -19,6 +21,9 @@ class Enemy():
         self.run = 0
         self.dir = 0
         self.last_update = time()
+        self.attack_ts = 0
+        
+        self.weapon = Weapon()
     
     def reset_name(self, name):
         self.name = name
@@ -41,6 +46,9 @@ class Enemy():
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
         screen.blit(self.texture, (self.interpolated_pos[0]-32, self.interpolated_pos[1]-42), texture_rect)
+        
+        r_cursor_pos = self.cursor_pos - self.pos
+        self.weapon.draw(screen, self.pos, self.id, r_cursor_pos, self.attack_ts)
 
 class Ball:
     def __init__(self):
