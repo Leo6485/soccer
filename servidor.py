@@ -97,6 +97,7 @@ class Game:
             ############################## Desconecta clientes inativos ##############################
             if crr_time - player.get("last_update") > 0.5:
                 self.IDs[id] = False
+                _exit(0)
                 
                 # Reinicia o servidor caso todos os jogadores tenham saído
                 if not any(self.IDs):
@@ -218,6 +219,7 @@ def quit(data, addr):
 # Rota para manter a conexão ativa sem definir um update
 @app.route("PING")
 def ping(data, addr):
+    print(game.players)
     if game.crr_screen == "mainmenu":
         game.players[data["id"]]["last_update"] = time()
 

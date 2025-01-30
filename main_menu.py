@@ -16,14 +16,18 @@ class MainMenu:
         self.name_input_box = pg.Rect(self.screen.get_width() / 2 - 150, self.screen.get_height() / 2 - 100, 300, 60)
 
     def update(self):
+        # self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame", "name": self.name}})
         for e in pg.event.get():
             if e.type == pg.QUIT:
                 self.running = False
-            if e.type == pg.MOUSEBUTTONDOWN:
-                if self.start_button.collidepoint(e.pos) and not self.manager.server_error:
+            
+
+            pressed = pg.key.get_pressed()
+            if pressed[pg.K_b]: # Gambiara
+                if 1:
                     self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame", "name": self.name}})
                     self.running = False
-
+            
             if e.type == pg.KEYDOWN:
                 if e.key == pg.K_BACKSPACE:
                     self.name = self.name[:-1]
