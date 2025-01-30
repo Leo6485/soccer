@@ -118,30 +118,33 @@ class Player:
                         "name": self.name
                      }
 
-    def draw_progress_bar(self, screen, progress, scale, padding):
-        bar_width = 50 * scale
-        bar_height = 5 * scale
-        x = self.pos.x * scale + padding.x - bar_width / 2
-        y = self.pos.y * scale + padding.y + self.size * scale + 10
+    def draw_progress_bar(self, screen, progress):
+        bar_width = 50
+        bar_height = 5
+        x = self.pos.x - bar_width / 2
+        y = self.pos.y + self.size + 10
 
-        pg.draw.rect(screen, (0, 100, 0), (int(x), int(y), int(bar_width), int(bar_height)))
-        pg.draw.rect(screen, (0, 255, 0), (int(x), int(y), int(bar_width * progress), int(bar_height)))
+        pg.draw.rect(screen, (0, 100, 0), (x, y, bar_width, bar_height))
+        pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
 
-    def draw(self, screen, scale, padding):
-        scaled_pos = self.pos * scale + padding
-        self.cursor.draw(screen, scaled_pos)
+    def draw(self, screen):
+        self.cursor.draw(screen, self.pos)
 
-        frame_y = (64 if self.cursor.pos.x < 0 else 0) * scale
-        frame_x = (int((time() * 6) % 3) * 64 if self.run else 128) * scale
+        frame_y = 64 if self.cursor.pos.x < 0 else 0
+        frame_x = int((time() * 6) % 3) * 64 if self.run else 128
 
-        texture_rect = pg.Rect(frame_x, frame_y, 64*scale, 64*scale)
-        screen.blit(self.texture, (int(scaled_pos.x - 32 * scale), int(scaled_pos.y - 42 * scale)), texture_rect)
+        texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
+        screen.blit(self.texture, (self.pos.x-32, self.pos.y-42), texture_rect)
 
-        text_rect = self.name_text.get_rect(center=(int(scaled_pos.x), int(scaled_pos.y - self.size * scale - 10)))
+        # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
+
+        # Desenha o nome do player
+        text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)
 
-        progress = min((time() - self.last_attack) / 0.5, 1)
-        self.draw_progress_bar(screen, progress, scale, padding)
+        # Desenha a barra de cooldown
+        progress = min((time() - self.last_attack)/0.5, 1)
+        self.draw_progress_bar(screen, progress)
 
     def reset_name(self, name):
         self.name = name
