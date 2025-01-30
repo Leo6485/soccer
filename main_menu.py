@@ -12,19 +12,15 @@ class MainMenu:
         self.name = self.manager.player.name
         self.running = True
 
-        # Definindo posições para os elementos da tela
         self.start_button = pg.Rect(self.screen.get_width() / 2 - 150, self.screen.get_height() / 2, 300, 60)
         self.name_input_box = pg.Rect(self.screen.get_width() / 2 - 150, self.screen.get_height() / 2 - 100, 300, 60)
 
     def update(self):
-        # Atualiza a lógica de eventos do menu
         for e in pg.event.get():
             if e.type == pg.QUIT:
                 self.running = False
             if e.type == pg.MOUSEBUTTONDOWN:
                 if self.start_button.collidepoint(e.pos) and not self.manager.server_error:
-                    # Envia a transição para o "ingame" e o nome do jogador
-                    self.manager.crr_screen = "ingame"
                     self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame", "name": self.name}})
                     self.running = False
 

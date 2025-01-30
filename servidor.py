@@ -18,7 +18,7 @@ class GamePlayer:
         
         return data
 
-respawn_points = [Vector2(50, 50), Vector2(1316, 50), Vector2(50, 718), Vector2(1316, 718)]
+respawn_points = [Vector2(100, 100), Vector2(1266, 100), Vector2(100, 668), Vector2(1266, 668)]
 
 class Ball:
     def __init__(self):

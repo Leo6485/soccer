@@ -13,6 +13,7 @@ class Game:
 
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont("Arial", 24)
+        self.score_font = pg.font.SysFont("Arial", 32)
 
     def update(self):
         for e in pg.event.get():
@@ -46,8 +47,8 @@ class Game:
         self.screen.blit(self.manager.map_texture, (0, 0))
         
         # Gols
-        pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
-        pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
+        # pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
+        # pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
 
         self.ball.draw(self.screen)
 
@@ -57,9 +58,19 @@ class Game:
 
         self.player.draw(self.screen)
 
+        # Draw scoreboard
+        self.draw_score()
+
         # Exibir FPS
         fps_text = self.font.render(f"FPS: {self.clock.get_fps():.1f}", True, (0, 0, 255))
         self.screen.blit(fps_text, (10, 10))
-
+        
+        # self.manager.render(self.screen)
         pg.display.flip()
         self.clock.tick(60)
+
+    def draw_score(self):
+        score_text = f"{self.manager.placar[0]}   {self.manager.placar[1]}"
+        score_surface = self.score_font.render(score_text, True, (119, 221, 119))
+        score_rect = score_surface.get_rect(center=(self.screen.get_width() // 2, 50))
+        self.screen.blit(score_surface, score_rect)
