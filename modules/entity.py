@@ -47,8 +47,8 @@ class Enemy():
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
         screen.blit(self.texture, (self.interpolated_pos[0]-32, self.interpolated_pos[1]-42), texture_rect)
         
-        r_cursor_pos = self.cursor_pos - self.pos
-        self.weapon.draw(screen, self.pos, self.id, r_cursor_pos, self.attack_ts)
+        r_cursor_pos = self.cursor_pos - self.interpolated_pos
+        self.weapon.draw(screen, self.interpolated_pos, self.id, r_cursor_pos, self.attack_ts)
 
 class Ball:
     def __init__(self):
