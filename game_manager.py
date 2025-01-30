@@ -20,15 +20,14 @@ class GameManager:
         self.players = {}
         self.ball = Ball()
         self.running = True
-        
-        self.screen = pg.Surface((1366, 768))
-        self.screen = pg.display.set_mode((1366, 768), pg.FULLSCREEN)
-        self.map_texture = self.load_map_texture()
-        self.player_textures = self.load_player_textures()
 
-        self.DD = pg.Vector2(1366, 720)
+        self.DD = pg.Vector2(1366, 768)
         self.scale = min(DW / self.DD.x, DH / self.DD.y)
         self.padding = pg.Vector2((DW - self.DD.x * self.scale) / 2, (DH - self.DD.y * self.scale) / 2)
+
+        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+        self.map_texture = self.load_map_texture()
+        self.player_textures = self.load_player_textures()
         
         self.server_msg = ""
         self.server_error = 0
@@ -39,12 +38,12 @@ class GameManager:
 
     def load_map_texture(self):
         map_texture = pg.image.load("assets/textures/map/campo.png").convert()
-        return pg.transform.scale(map_texture, (DW, DH))
+        return pg.transform.scale(map_texture, (int(DW * self.scale), int(DH * self.scale)))
 
     def load_player_textures(self):
         texture_path = "assets/textures/player"
         textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
-        return [pg.transform.scale(texture, (192, 128)) for texture in textures]
+        return [pg.transform.scale(texture, (int(192 * self.scale), int(128 * self.scale))) for texture in textures]
 
     def run(self):
         self.clock = pg.time.Clock()
@@ -55,14 +54,9 @@ class GameManager:
                 self.main_menu.draw()
             pg.mouse.set_visible(0)
             while self.crr_screen == "ingame" and self.running:
-
+                
                 self.game.update()
                 self.game.draw()
-
-    def render(self, screen):
-        frame = pg.transform.scale(screen, (DW, DH))
-        self.final_screen.blit(frame, (0, 0))
-        pg.display.flip()
 
     def update_game_state(self, data, crr_time):
         self.ball.pos = pg.Vector2(data["ball"])

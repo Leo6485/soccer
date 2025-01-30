@@ -26,21 +26,21 @@ class Enemy():
 
     def update(self):
         crr_time = time()
-        if crr_time - self.respawn_ts < 1.5:
+        if (crr_time - self.respawn_ts < 1.5):
             self.interpolated_pos = self.pos
         else:
             self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv
 
-    def draw(self, screen):
-        text_rect = self.name_text.get_rect(center=(self.interpolated_pos[0], self.interpolated_pos[1] - self.size - 10))
+    def draw(self, screen, scale, padding):
+        scaled_pos = self.interpolated_pos * scale + padding
+        text_rect = self.name_text.get_rect(center=(int(scaled_pos.x), int(scaled_pos.y - self.size * scale - 10)))
         screen.blit(self.name_text, text_rect)
         frame_y = 64 if self.dir else 0
         frame_x = int((time() * 6) % 3) * 64
-        
         frame_x = frame_x if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (self.interpolated_pos[0]-32, self.interpolated_pos[1]-42), texture_rect)
+        screen.blit(self.texture, (int(scaled_pos.x - 32 * scale), int(scaled_pos.y - 42 * scale)), texture_rect)
 
 class Ball:
     def __init__(self):
@@ -55,8 +55,9 @@ class Ball:
     def update(self):
         self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv
 
-    def draw(self, screen):
-        texture_rect = self.texture.get_rect(center=(self.interpolated_pos.x, self.interpolated_pos.y + 8))
+    def draw(self, screen, scale, padding):
+        scaled_pos = self.interpolated_pos * scale + padding
+        texture_rect = self.texture.get_rect(center=(int(scaled_pos.x), int(scaled_pos.y + 8 * scale)))
         screen.blit(self.texture, texture_rect)
         # pg.draw.circle(screen, (255, 255, 255), self.pos, self.size, width=2)
 

@@ -45,29 +45,22 @@ class Game:
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.manager.map_texture, (0, 0))
-        
-        # Gols
-        # pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
-        # pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
 
-        self.ball.draw(self.screen)
+        self.ball.draw(self.screen, self.manager.scale, self.manager.padding)
 
         for id, p in self.players.items():
             if id != self.player.id and self.IDs[id]:
-                p.draw(self.screen)
+                p.draw(self.screen, self.manager.scale, self.manager.padding)
 
-        self.player.draw(self.screen)
+        self.player.draw(self.screen, self.manager.scale, self.manager.padding)
 
-        # Draw scoreboard
         self.draw_score()
 
-        # Exibir FPS
         fps_text = self.font.render(f"FPS: {self.clock.get_fps():.1f}", True, (0, 0, 255))
         self.screen.blit(fps_text, (10, 10))
-        
-        # self.manager.render(self.screen)
+
         pg.display.flip()
-        self.clock.tick(60)
+        self.clock.tick(200)
 
     def draw_score(self):
         score_text = f"{self.manager.placar[0]}   {self.manager.placar[1]}"
