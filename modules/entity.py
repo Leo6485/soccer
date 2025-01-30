@@ -40,7 +40,7 @@ class Enemy():
         frame_x = frame_x if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (int(scaled_pos.x - 32 * scale), int(scaled_pos.y - 42 * scale)), texture_rect)
+        screen.blit(self.texture, (int(self.interpolated_pos.x - 32), int(self.interpolated_pos.y - 42)), texture_rect)
 
 class Ball:
     def __init__(self):

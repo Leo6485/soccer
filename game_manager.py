@@ -38,12 +38,12 @@ class GameManager:
 
     def load_map_texture(self):
         map_texture = pg.image.load("assets/textures/map/campo.png").convert()
-        return pg.transform.scale(map_texture, (int(DW * self.scale), int(DH * self.scale)))
+        return pg.transform.scale(map_texture, (DW, DH))
 
     def load_player_textures(self):
         texture_path = "assets/textures/player"
         textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
-        return [pg.transform.scale(texture, (int(192 * self.scale), int(128 * self.scale))) for texture in textures]
+        return [pg.transform.scale(texture, (192, 128)) for texture in textures]
 
     def run(self):
         self.clock = pg.time.Clock()
