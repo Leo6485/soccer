@@ -39,7 +39,7 @@ class GameManager:
     
     def flip(self):
         frame = pg.transform.scale(self.screen, (DW, DH))
-        self.final_screen.blit(frame, (0, 0))
+        self.final_screen.blit(frame, self.padding)
         pg.display.flip()
 
     def load_map_texture(self):
