@@ -4,6 +4,11 @@ import modules.jsonbin as jsonbin
 from modules.net import Server
 from pygame import Vector2
 from threading import Lock
+from modules.entity import CharacterBaseData
+
+class Character(CharacterBaseData):
+    def __init__(self, id, name):
+        super().__init__(id, name)
 
 class GamePlayer:
     def __init__(self):
@@ -98,7 +103,7 @@ class Game:
         self.game_end_ts = 0
     
     def restart(self):
-        print("Reiniciando o servidor")
+        print("\033cReiniciando o servidor")
         self.__init__()
     
     def get_free_id(self):
@@ -167,7 +172,7 @@ class Game:
         self.ball.vel = Vector2(0, 0)
 
     def update_screens(self, crr_time):
-        if 2 in self.placar and self.crr_screen == "ingame":
+        if 1 in self.placar and self.crr_screen == "ingame":
             self.crr_screen = "gameover"
             self.game_end_ts = crr_time
         if self.crr_screen == "gameover" and crr_time - self.game_end_ts > 5:

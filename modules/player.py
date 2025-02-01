@@ -1,6 +1,7 @@
 import pygame as pg
 from time import time
 from modules.weapon import Weapon
+from modules.entity import CharacterBaseData
 
 pg.init()
 d = pg.display.Info()
@@ -41,29 +42,21 @@ class Cursor:
         pg.draw.circle(screen, (0, 255, 0), (player_pos + self.pos), 4)
         pg.draw.circle(screen, (0, 255, 0), (player_pos + self.pos), 20, width=2)
 
-class Player:
+class Player(CharacterBaseData):
     vel = 0.05
 
     def __init__(self, id, name):
-        self.pos = pg.Vector2(100, 100)
-        self.size = 25
-        self.life = 100
-        self.run = 0
-        self.dir = 0
-        self.attack_ts = 0
+        super().__init__(id, name)
+
         self.last_attack = 0
         self.attack_target = None
-        self.respawn_ts = 0
         self.cursor = Cursor()
-        self.name = name
+
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
-        self.id = id
-        self.team = self.id % 2 + 1
-        self.data = {"pos": [0, 0], "id": id}
         self.texture = pg.image.load(f"assets/textures/player/pato{self.team}.png")
         self.texture = pg.transform.scale(self.texture, (192, 128))
         
-        self.weapon = Weapon()
+        self.data = {"pos": [0, 0], "id": id}
 
     def update(self, pressed, mouse_pressed, ball, players, IDs):
         self.cursor.update()

@@ -3,27 +3,40 @@ from math import sqrt
 from time import time
 from modules.weapon import Weapon
 
-class Enemy():
+class CharacterBaseData:
     def __init__(self, id, name):
-        self.id = id
-        self.team = self.id%2 + 1
         self.size = 25
-        self.pos = pg.Vector2(0, 0)
+        self.pos = pg.Vector2(100, 100)
+        self.id = id
+        self.name = name
+        self.team = self.id%2
+        
+        # Timestamps
+        self.respawn_ts = 0
+        self.attack_ts = 0
+        
+        # Animações
+        self.run = 0
+        self.dir = 0
+        
+        self.weapon = Weapon()
+        
+        # Compatibilidade entre player e enemy
+        self.cursor_pos = pg.Vector2(0, 0)
+        self.attack_target = None
+        self.last_update = time()
+
+class Enemy(CharacterBaseData):
+    def __init__(self, id, name):
+        super().__init__(id, name)
         self.cursor_pos = pg.Vector2(0, 0)
         self.interpolated_pos = pg.Vector2(0, 0)
         self.interpolation_lv = 2
 
         self.texture = None
-        self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
 
-        self.respawn_ts = 0
-        self.run = 0
-        self.dir = 0
         self.last_update = time()
-        self.attack_ts = 0
-        
-        self.weapon = Weapon()
     
     def reset_name(self, name):
         self.name = name
