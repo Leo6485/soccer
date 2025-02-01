@@ -47,8 +47,15 @@ class Game:
         self.screen.blit(self.manager.map_texture, (0, 0))
         
         # Gols
-        # pg.draw.rect(self.screen, ((20, 20, 20)), (0, 200, 150, 368), width=10)
-        # pg.draw.rect(self.screen, (20, 20, 20), (1216, 200, 150, 368), width=10)
+        traves = [
+            (0, 134, 245, 255),    # Trave esquerda superior
+            (0, 134, 505, 515),    # Trave esquerda inferior
+            (1232, 1366, 245, 255), # Trave direita superior
+            (1232, 1366, 505, 515)  # Trave direita inferior
+        ]
+        
+        # for x_min, x_max, y_min, y_max in traves:
+            # pg.draw.rect(self.screen, (255, 0, 0), (x_min, y_min, x_max - x_min, y_max - y_min), width=10)
 
         self.ball.draw(self.screen)
 
@@ -64,6 +71,11 @@ class Game:
         # Exibir FPS
         fps_text = self.font.render(f"FPS: {self.clock.get_fps():.1f}", True, (0, 0, 255))
         self.screen.blit(fps_text, (10, 10))
+
+        # Exibir posição do cursor
+        cursor_pos = self.player.pos + self.player.cursor.pos
+        cursor_text = self.font.render(f"Cursor: {cursor_pos}", True, (20, 20, 20))
+        self.screen.blit(cursor_text, (10, 40))
         
         # pg.display.flip()
         self.manager.flip()

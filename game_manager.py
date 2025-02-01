@@ -1,6 +1,7 @@
 import pygame as pg
-from game import Game
-from main_menu import MainMenu
+from windows.game import Game
+from windows.main_menu import MainMenu
+from windows.gameover import GameOver
 from modules.player import Player
 from modules.entity import Ball, Enemy
 from modules.weapon import Weapon
@@ -38,6 +39,7 @@ class GameManager:
         self.app.send(data)
         self.game = Game(self.app, self)
         self.main_menu = MainMenu(self.app, self)
+        self.gameover = GameOver(self.app, self)
     
     def flip(self):
         frame = pg.transform.scale(self.screen, (DW, DH))
@@ -61,15 +63,21 @@ class GameManager:
     def run(self):
         self.clock = pg.time.Clock()
         while self.running:
+
             pg.mouse.set_visible(1)
             while self.crr_screen == "mainmenu" and self.running:
                 self.main_menu.update()
                 self.main_menu.draw()
+
             pg.mouse.set_visible(0)
             while self.crr_screen == "ingame" and self.running:
-                
                 self.game.update()
                 self.game.draw()
+            
+            pg.mouse.set_visible(1)
+            while self.crr_screen == "gameover" and self.running:
+                self.gameover.update()
+                self.gameover.draw()
 
     def update_game_state(self, data, crr_time):
         self.ball.pos = pg.Vector2(data["ball"])
@@ -82,7 +90,7 @@ class GameManager:
                 self.player.respawn_ts = player.get("respawn_ts")
                 if crr_time - player.get("respawn_ts", 0) < 0.5:
                     self.player.pos = player["pos"]
-        self.placar = data["placar"]
+        self.placar[:] = data["placar"]
         self.crr_screen = data["crr_screen"]
 
     def update_enemies(self, player, id, crr_time):
