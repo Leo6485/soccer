@@ -14,17 +14,14 @@ class CharacterBaseData:
         # Timestamps
         self.respawn_ts = 0
         self.attack_ts = 0
+        self.jail_ts = 0
         
         # Animações
         self.run = 0
         self.dir = 0
         
         self.weapon = Weapon()
-        
-        # Compatibilidade entre player e enemy
-        self.cursor_pos = pg.Vector2(0, 0)
-        self.attack_target = None
-        self.last_update = time()
+        self.jail_textures = None
 
 class Enemy(CharacterBaseData):
     def __init__(self, id, name):
@@ -49,19 +46,42 @@ class Enemy(CharacterBaseData):
         else:
             self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv
 
-    def draw(self, screen):
+    def draw(self, screen, player_pos=pg.Vector2(-1000, -1000)):
+        distance = (self.interpolated_pos - player_pos).length()
+        opacity = 128 if distance < 80 else 255
+
+        # Set alpha for all textures
+        if self.texture:
+            texture = self.texture.copy()
+            texture.set_alpha(opacity)
+        
+        jail_texture = [None, None]
+        if self.jail_textures:
+            jail_texture[0] = self.jail_textures[0].copy()
+            jail_texture[0].set_alpha(opacity)
+            jail_texture[1] = self.jail_textures[1].copy()
+            jail_texture[1].set_alpha(opacity)
+
+        # Draw textures
+        draw_jail = time() - self.jail_ts < 1.5 and self.jail_textures
+        if draw_jail:
+            screen.blit(jail_texture[0], (self.interpolated_pos[0] - 64, self.interpolated_pos[1] - 80))
+
         text_rect = self.name_text.get_rect(center=(self.interpolated_pos[0], self.interpolated_pos[1] - self.size - 10))
         screen.blit(self.name_text, text_rect)
+
         frame_y = 64 if self.dir else 0
         frame_x = int((time() * 6) % 3) * 64
-        
         frame_x = frame_x if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (self.interpolated_pos[0]-32, self.interpolated_pos[1]-42), texture_rect)
-        
+        screen.blit(texture, (self.interpolated_pos[0] - 32, self.interpolated_pos[1] - 42), texture_rect)
+
         r_cursor_pos = self.cursor_pos - self.interpolated_pos
-        self.weapon.draw(screen, self.interpolated_pos, self.id, r_cursor_pos, self.attack_ts)
+        self.weapon.draw(screen, self.interpolated_pos, self.id, r_cursor_pos, self.attack_ts, opacity)
+
+        if draw_jail:
+            screen.blit(jail_texture[1], (self.interpolated_pos[0] - 64, self.interpolated_pos[1] - 80))
 
 class Ball:
     def __init__(self):
@@ -72,13 +92,18 @@ class Ball:
 
         self.texture = pg.image.load("assets/textures/disc/disc.png")
         self.texture = pg.transform.scale(self.texture, (self.size * 4.5, self.size * 4.5))
-    
+
     def update(self):
         self.interpolated_pos += (self.pos - self.interpolated_pos) / self.interpolation_lv
 
     def draw(self, screen):
-        texture_rect = self.texture.get_rect(center=(self.interpolated_pos.x, self.interpolated_pos.y + 8))
-        screen.blit(self.texture, texture_rect)
+        # Set alpha for texture
+        texture = self.texture.copy()
+        texture.set_alpha(255)  # Assuming full opacity for the ball
+
+        # Draw texture
+        texture_rect = texture.get_rect(center=(self.interpolated_pos.x, self.interpolated_pos.y + 8))
+        screen.blit(texture, texture_rect)
         # pg.draw.circle(screen, (255, 255, 255), self.pos, self.size, width=2)
 
     def calc_dist(self, pos):

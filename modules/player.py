@@ -25,12 +25,7 @@ class Cursor:
             self.delta = self.pos.copy()
         elif dist <= self.limit:
             self.pos = d
-
-            if dist:
-                self.delta = d / (dist / 100)
-            else:
-                self.delta.x = 0
-                self.delta.y = 0
+            self.delta = d / (dist / 100) if dist else pg.Vector2(0, 0)
 
         cr = 10
         self.last_cursor_pos = pg.Vector2(pg.mouse.get_pos())
@@ -50,6 +45,8 @@ class Player(CharacterBaseData):
 
         self.last_attack = 0
         self.attack_target = None
+        self.has_jail = 0
+        self.put_jail_ts = 0
         self.cursor = Cursor()
 
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
@@ -62,7 +59,7 @@ class Player(CharacterBaseData):
         self.cursor.update()
         
         self.dir = self.cursor.pos.x < 0
-        self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5)
+        self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5 and time() - self.jail_ts > 1.5)
         if self.run:
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
@@ -99,6 +96,10 @@ class Player(CharacterBaseData):
 
                 self.attack_ts = time()
                 self.last_attack = self.attack_ts
+        
+        if pressed[pg.K_d]:
+            if self.has_jail:
+                self.put_jail_ts = time()
 
         self.update_data()
 
@@ -111,7 +112,8 @@ class Player(CharacterBaseData):
                         "attack_target": self.attack_target,
                         "run": self.run,
                         "dir": self.dir,
-                        "name": self.name
+                        "name": self.name,
+                        "put_jail_ts": self.put_jail_ts
                      }
 
     def draw_progress_bar(self, screen, progress):
@@ -124,6 +126,11 @@ class Player(CharacterBaseData):
         pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
 
     def draw(self, screen):
+        
+        draw_jail = time() - self.jail_ts < 1.5 and self.jail_textures
+        if draw_jail:
+            screen.blit(self.jail_textures[0], (self.pos.x - 64, self.pos.y - 80))
+
         self.cursor.draw(screen, self.pos)
 
         frame_y = 64 if self.cursor.pos.x < 0 else 0
@@ -141,6 +148,9 @@ class Player(CharacterBaseData):
         # Desenha a barra de cooldown
         progress = min((time() - self.last_attack)/0.5, 1)
         self.draw_progress_bar(screen, progress)
+        
+        if draw_jail:
+            screen.blit(self.jail_textures[1], (self.pos.x - 64, self.pos.y - 80))
 
     def reset_name(self, name):
         self.name = name

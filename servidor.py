@@ -145,7 +145,22 @@ class Game:
                         pos = respawn_points[id]
                         self.players[id]["pos"] = pos   
                         self.players[id]["respawn_ts"] = crr_time
+                        
+                        # Limpa os efeitos da jail
+                        self.players[id]["jail_ts"] = 0
             player["last_attack"] = crr_time
+        
+        # Jail
+        put_jail_ts = player.get("put_jail_ts", 0)
+        has_jail = player.get("has_jail", 0)
+        if crr_time - put_jail_ts < 0.5 and has_jail:
+            print(f"Player {player['id']} colocou uma jaula")
+            for p_id, p in self.players.items():
+                if p_id == player["id"]:
+                    continue
+                
+                self.players[p_id]["jail_ts"] = crr_time
+            player["has_jail"] = 0
 
     def check_goal(self, crr_time):
         gol = 0
@@ -195,6 +210,7 @@ def connect(data, addr):
     if game.crr_screen == "ingame":
         game.IDs[player_id] = False
         return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
+
     player_data = {
         "addr": addr,
         "pos": respawn_points[player_id],
@@ -203,7 +219,10 @@ def connect(data, addr):
         "attack_ts": 0,
         "last_attack": 0,
         "respawn_ts": crr_time,
-        "last_update": crr_time
+        "last_update": crr_time,
+        "jail_ts": 0,
+        "has_jail": 1,
+        "put_jail_ts": 0
     }
     game.players[player_id] = player_data
     game.clients[player_id] = addr
@@ -222,13 +241,14 @@ def update(data, addr):
     player["last_update"] = crr_time
 
     # Recusa no respawn
-    if crr_time - game.players[id].get("respawn_ts", 0) > 1.5:
+    if crr_time - game.players[id].get("respawn_ts", 0) > 1.5 and crr_time - game.players[id].get("jail_ts", 0) > 1.5:
         player["pos"] = Vector2(data["pos"])
         player["name"] = data["name"]
         player["run"] = data["run"]
         player["dir"] = data["dir"]
         player["attack_ts"] = data["attack_ts"]
         player["attack_target"] = data["attack_target"]
+        player["put_jail_ts"] = data["put_jail_ts"]
 
 
 @app.route("QUIT")
@@ -275,5 +295,7 @@ while True:
         delta_time = end - start
     except KeyboardInterrupt:
         break
+    except Exception as e:
+        print(e)
 
 app.stop()

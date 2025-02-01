@@ -28,6 +28,7 @@ class GameManager:
         self.map_texture = self.load_map_texture()
         self.player_textures = self.load_player_textures()
         self.weapon_textures = self.load_weapon_textures()
+        self.jail_textures = self.load_jail_textures()
 
         self.DD = pg.Vector2(1366, 768)
         self.scale = min(DW / self.DD.x, DH / self.DD.y)
@@ -55,6 +56,11 @@ class GameManager:
         textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 128)) for texture in textures]
     
+    def load_jail_textures(self):
+        texture_path = "assets/textures/items"
+        textures = [pg.image.load(texture_path + "/jail_back.png").convert_alpha(), pg.image.load(texture_path + "/jail_front.png").convert_alpha()]
+        return [pg.transform.scale(texture, (128, 128)) for texture in textures]
+
     def load_weapon_textures(self):
         path = "assets/textures/player"
         textures = [pg.image.load(path + "/shotgun1.png").convert_alpha(), pg.image.load(path + "/shotgun2.png").convert_alpha()]
@@ -87,9 +93,14 @@ class GameManager:
             if id != self.player.id:
                 self.update_enemies(player, id, crr_time)
             else:
-                self.player.respawn_ts = player.get("respawn_ts")
-                if crr_time - player.get("respawn_ts", 0) < 0.5:
+                self.player.respawn_ts = player["respawn_ts"]
+                self.player.jail_ts = player["jail_ts"]
+                self.player.has_jail = player["has_jail"]
+                
+                # O Servidor controla a posição nessas situações
+                if crr_time - player["respawn_ts"] < 1.5 or crr_time - player["jail_ts"] < 1.5:
                     self.player.pos = player["pos"]
+
         self.placar[:] = data["placar"]
         self.crr_screen = data["crr_screen"]
 
@@ -103,6 +114,7 @@ class GameManager:
             enemy.respawn_ts = player.get("respawn_ts", 0)
             enemy.last_update = crr_time
             enemy.attack_ts = player["attack_ts"]
+            enemy.jail_ts = player["jail_ts"]
             if crr_time - enemy.respawn_ts < 1:
                 enemy.reset_name(player["name"])
             if enemy.name != player["name"]:
@@ -112,5 +124,6 @@ class GameManager:
             enemy.pos = player["pos"]
             enemy.texture = self.player_textures[id % 2]
             enemy.weapon.texture = self.weapon_textures[id % 2]
+            enemy.jail_textures = self.jail_textures
             enemy.last_update = crr_time
             self.players[id] = enemy

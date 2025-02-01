@@ -45,23 +45,12 @@ class Game:
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.manager.map_texture, (0, 0))
-        
-        # Gols
-        traves = [
-            (0, 134, 245, 255),    # Trave esquerda superior
-            (0, 134, 505, 515),    # Trave esquerda inferior
-            (1232, 1366, 245, 255), # Trave direita superior
-            (1232, 1366, 505, 515)  # Trave direita inferior
-        ]
-        
-        # for x_min, x_max, y_min, y_max in traves:
-            # pg.draw.rect(self.screen, (255, 0, 0), (x_min, y_min, x_max - x_min, y_max - y_min), width=10)
 
         self.ball.draw(self.screen)
 
         for id, p in self.players.items():
             if id != self.player.id and self.IDs[id]:
-                p.draw(self.screen)
+                p.draw(self.screen, self.player.pos)
 
         self.player.draw(self.screen)
 
@@ -73,13 +62,13 @@ class Game:
         self.screen.blit(fps_text, (10, 10))
 
         # Exibir posição do cursor
-        cursor_pos = self.player.pos + self.player.cursor.pos
-        cursor_text = self.font.render(f"Cursor: {cursor_pos}", True, (20, 20, 20))
-        self.screen.blit(cursor_text, (10, 40))
+        # cursor_pos = self.player.pos + self.player.cursor.pos
+        # cursor_text = self.font.render(f"Cursor: {cursor_pos}", True, (20, 20, 20))
+        # self.screen.blit(cursor_text, (10, 40))
         
         # pg.display.flip()
         self.manager.flip()
-        self.clock.tick(60)
+        self.clock.tick(200)
 
     def draw_score(self):
         score_text = f"{self.manager.placar[0]}   {self.manager.placar[1]}"
