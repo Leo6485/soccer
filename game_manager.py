@@ -5,6 +5,7 @@ from windows.gameover import GameOver
 from modules.player import Player
 from modules.entity import Ball, Enemy
 from modules.weapon import Weapon
+from modules.entity import CharacterBaseData
 
 pg.init()
 pg.mouse.set_visible(1)
@@ -83,33 +84,34 @@ class GameManager:
         self.ball.pos = pg.Vector2(data["ball"])
         self.IDs[:] = data["IDs"]
         for player in data["players"].values():
-            id = player["id"]
+            id = player.id
             if id != self.player.id:
                 self.update_enemies(player, id, crr_time)
             else:
-                self.player.respawn_ts = player.get("respawn_ts")
-                if crr_time - player.get("respawn_ts", 0) < 0.5:
-                    self.player.pos = player["pos"]
+                self.player.respawn_ts = player.respawn_ts
+                if crr_time - player.respawn_ts < 0.5:
+                    self.player.pos = player.pos
+
         self.placar[:] = data["placar"]
         self.crr_screen = data["crr_screen"]
 
     def update_enemies(self, player, id, crr_time):
         if id in self.players:
             enemy = self.players[id]
-            enemy.pos = player["pos"]
-            enemy.cursor_pos = player.get("cursor_pos", pg.Vector2(0, 0))
-            enemy.run = player.get("run", 0)
-            enemy.dir = player.get("dir", False)
-            enemy.respawn_ts = player.get("respawn_ts", 0)
+            enemy.pos = player.pos
+            enemy.cursor_pos = player.cursor_pos
+            enemy.run = player.run
+            enemy.dir = player.dir
+            enemy.respawn_ts = player.respawn_ts
             enemy.last_update = crr_time
-            enemy.attack_ts = player["attack_ts"]
+            enemy.attack_ts = player.attack_ts
             if crr_time - enemy.respawn_ts < 1:
-                enemy.reset_name(player["name"])
-            if enemy.name != player["name"]:
-                enemy.reset_name(player["name"])
+                enemy.reset_name(player.name)
+            if enemy.name != player.name:
+                enemy.reset_name(player.name)
         else:
-            enemy = Enemy(id, player["name"])
-            enemy.pos = player["pos"]
+            enemy = Enemy(id, player.name)
+            enemy.pos = player.pos
             enemy.texture = self.player_textures[id % 2]
             enemy.weapon.texture = self.weapon_textures[id % 2]
             enemy.last_update = crr_time

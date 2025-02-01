@@ -24,6 +24,7 @@ class CharacterBaseData:
         # Compatibilidade entre player e enemy
         self.cursor_pos = pg.Vector2(0, 0)
         self.attack_target = None
+        self.last_attack = 0
         self.last_update = time()
 
 class Enemy(CharacterBaseData):

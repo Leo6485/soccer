@@ -6,10 +6,6 @@ from pygame import Vector2
 from threading import Lock
 from modules.entity import CharacterBaseData
 
-class Character(CharacterBaseData):
-    def __init__(self, id, name):
-        super().__init__(id, name)
-
 class GamePlayer:
     def __init__(self):
         self.timestamps = {}
@@ -34,7 +30,7 @@ class Ball:
                 self.update_move(player, delta_time)
     
     def update_move(self, player, delta_time):
-        d, distancia = self.calc_dist(player["pos"])
+        d, distancia = self.calc_dist(player.pos)
         if distancia == 0:
             return
         d /= distancia * 1200 * delta_time
@@ -128,29 +124,29 @@ class Game:
         self.update_screens(crr_time)
 
     def check_inactive_player(self, id, player, crr_time):
-        if crr_time - player.get("last_update") > 1:
+        if crr_time - player.last_update > 1:
             self.IDs[id] = False
             if not any(self.IDs):
                 self.restart()
 
     def handle_attack(self, id, player, crr_time):
-        att_ts = player.get("attack_ts", 0)
-        last_att = player.get("last_attack", 0)
-        attack_target = player.get("attack_target", None)
+        att_ts = player.attack_ts
+        last_att = player.last_attack
+        attack_target = player.attack_target
         if crr_time - att_ts < 0.5 and att_ts - last_att > 0.5:
             if attack_target is not None:
                 target_player = self.players.get(attack_target)
                 if target_player:
-                    target = target_player["pos"]
-                    cursor = player["cursor_pos"]
+                    target = target_player.pos
+                    cursor = player.cursor_pos
                     distancia = (target - cursor).length()
                     if distancia < 50:
-                        print(f"Player {id}:{player['id']} atacou player {target_player['id']}")
-                        id = target_player["id"]
+                        print(f"Player {id}:{player.id} atacou player {target_player.id}")
+                        id = target_player.id
                         pos = respawn_points[id]
-                        self.players[id]["pos"] = pos   
-                        self.players[id]["respawn_ts"] = crr_time
-            player["last_attack"] = crr_time
+                        self.players[id].pos = pos   
+                        self.players[id].respawn_ts = crr_time
+            player.last_attack = crr_time
 
     def check_goal(self, crr_time):
         gol = 0
@@ -164,8 +160,8 @@ class Game:
             gol = 1
         if gol:
             for player in self.players.values():
-                player["respawn_ts"] = crr_time
-                player["pos"] = respawn_points[player["id"]]
+                player.respawn_ts = crr_time
+                player.pos = respawn_points[player.id]
 
     def reset_ball(self):
         self.ball.pos = Vector2(683, 382)
@@ -200,16 +196,12 @@ def connect(data, addr):
     if game.crr_screen == "ingame":
         game.IDs[player_id] = False
         return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
-    player_data = {
-        "addr": addr,
-        "pos": respawn_points[player_id],
-        "name": data["name"],
-        "id": player_id,
-        "attack_ts": 0,
-        "last_attack": 0,
-        "respawn_ts": crr_time,
-        "last_update": crr_time
-    }
+    
+    player_data = CharacterBaseData(player_id, data["name"])
+    player_data.addr = addr
+    player_data.pos = respawn_points[player_id]
+    player_data.respawn_ts = crr_time
+    player_data.last_update = crr_time
     game.players[player_id] = player_data
     game.clients[player_id] = addr
     print(f"Novo jogador conectado: {data}")
@@ -220,15 +212,15 @@ def update(data, addr):
     crr_time = time()
     id = data["id"]
     player = game.players[id]
-    player["cursor_pos"] = Vector2(data["cursor_pos"])
-    if crr_time - game.players[id].get("respawn_ts", 0) > 1.5:
-        player["pos"] = Vector2(data["pos"])
-        player["attack_ts"] = data["attack_ts"]
-        player["attack_target"] = data["attack_target"]
-        player["run"] = data["run"]
-        player["dir"] = data["dir"]
-        player["name"] = data["name"]
-    player["last_update"] = crr_time
+    player.cursor_pos = Vector2(data["cursor_pos"])
+    if crr_time - player.respawn_ts > 1.5:
+        player.pos = Vector2(data["pos"])
+        player.attack_ts = data["attack_ts"]
+        player.attack_target = data["attack_target"]
+        player.run = data["run"]
+        player.dir = data["dir"]
+        player.name = data["name"]
+    player.last_update = crr_time
 
 @app.route("QUIT")
 def quit(data, addr):
@@ -242,8 +234,7 @@ def quit(data, addr):
 
 @app.route("PING")
 def ping(data, addr):
-    print(f"{data['id']} mandou ping")
-    game.players[data["id"]]["last_update"] = time()
+    game.players[data["id"]].last_update = time()
 
 print("/033c", end="\r")
 app.run(wait=False)
@@ -274,5 +265,7 @@ while True:
         delta_time = end - start
     except KeyboardInterrupt:
         break
-
+    except Exception as e:
+        print(e)
+        break
 app.stop()
