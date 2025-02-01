@@ -5,13 +5,8 @@ class Weapon:
     def __init__(self):
         self.texture = None
     
-    def draw(self, screen, player_pos, p_id, cursor_pos, attack_ts, opacity=255):
+    def draw(self, screen, player_pos, p_id, cursor_pos, attack_ts):
         if self.texture is None: return
-        
-        # Set alpha for texture if opacity is different from 255
-        weapon_texture = self.texture.copy()
-        if opacity != 255:
-            weapon_texture.set_alpha(opacity)
         
         r_cursor_pos = cursor_pos + player_pos
         weapon_pos = player_pos + cursor_pos / 8
@@ -28,7 +23,7 @@ class Weapon:
         frame_y = 32 if cursor_pos.x < 0 else 0
         
         texture_rect = pg.Rect(frame_x, frame_y, 64, 32)
-        weapon_texture = weapon_texture.subsurface(texture_rect)
+        weapon_texture = self.texture.subsurface(texture_rect)
         
         weapon_texture = pg.transform.rotate(weapon_texture, angle)
         texture_rect = weapon_texture.get_rect(center=weapon_pos)
