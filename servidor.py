@@ -4,11 +4,6 @@ import modules.jsonbin as jsonbin
 from modules.net import Server
 from pygame import Vector2
 from threading import Lock
-from modules.entity import CharacterBaseData
-
-class Character(CharacterBaseData):
-    def __init__(self, id, name):
-        super().__init__(id, name)
 
 class GamePlayer:
     def __init__(self):
