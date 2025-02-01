@@ -126,15 +126,16 @@ class Player(CharacterBaseData):
         pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
 
     def draw(self, screen):
-        
-        draw_jail = time() - self.jail_ts < 1.5 and self.jail_textures
+        crr_time = time()
+
+        draw_jail = crr_time - self.jail_ts < 1.5 and self.jail_textures
         if draw_jail:
             screen.blit(self.jail_textures[0], (self.pos.x - 64, self.pos.y - 80))
 
         self.cursor.draw(screen, self.pos)
 
         frame_y = 64 if self.cursor.pos.x < 0 else 0
-        frame_x = int((time() * 6) % 3) * 64 if self.run else 128
+        frame_x = int((crr_time * 6) % 3) * 64 if self.run else 128
 
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
         screen.blit(self.texture, (self.pos.x-32, self.pos.y-42), texture_rect)
@@ -146,7 +147,7 @@ class Player(CharacterBaseData):
         screen.blit(self.name_text, text_rect)
 
         # Desenha a barra de cooldown
-        progress = min((time() - self.last_attack)/0.5, 1)
+        progress = min((crr_time - self.last_attack)/0.5, 1)
         self.draw_progress_bar(screen, progress)
         
         if draw_jail:
