@@ -97,10 +97,15 @@ class Game:
         self.started = False
         self.game_end_ts = 0
     
-    def restart(self):
+    def restart_server(self):
         print("\033cReiniciando o servidor")
         self.__init__()
-    
+
+    def restart(self):
+        self.placar = [0, 0]
+        self.reset_ball()
+        self.crr_screen = "mainmenu"
+
     def get_free_id(self):
         try:
             id = self.IDs.index(False)
@@ -126,7 +131,7 @@ class Game:
         if crr_time - player.get("last_update") > 1:
             self.IDs[id] = False
             if not any(self.IDs):
-                self.restart()
+                self.restart_server()
 
     def handle_attack(self, id, player, crr_time):
         att_ts = player.get("attack_ts", 0)
@@ -186,8 +191,7 @@ class Game:
             self.crr_screen = "gameover"
             self.game_end_ts = crr_time
         if self.crr_screen == "gameover" and crr_time - self.game_end_ts > 5:
-            self.placar = [0, 0]
-            self.crr_screen = "mainmenu"
+            self.restart()
 
 respawn_points = [Vector2(100, 100), Vector2(1266, 100), Vector2(100, 668), Vector2(1266, 668)]
 
