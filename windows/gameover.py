@@ -38,7 +38,7 @@ class GameOver:
             pg.draw.line(self.screen, (0, 255, 255), (0, i), (self.screen_width, i), 1)
 
     def draw_result(self):
-        result = "Vitória" if self.manager.placar[self.manager.player.team] == min(self.manager.placar) else "Derrota"
+        result = "Vitória" if self.manager.placar[self.manager.player.team] == max(self.manager.placar) else "Derrota"
         font = self.font_vitoria if result == "Vitória" else self.font_derrota
         result_text = font.render(result, True, (255, 0, 255))
         self.screen.blit(result_text, (1366 / 2 - result_text.get_width() / 2, 768 / 4))

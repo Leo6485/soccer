@@ -1,6 +1,5 @@
 import socket
 from threading import Thread
-import json
 import pickle
 
 class Server:
@@ -12,14 +11,12 @@ class Server:
         self.server.bind((self.ip, port))
         self.routes = {}
         print(f"[ * ] Vinculado como: {self.ip}:{self.port}")
-    
+
     def parse(self, data):
-        # data = data.decode().strip()
-        # data = json.loads(data)
-        
         data = pickle.loads(data)
         route = data.get("type", None).upper()
-        if route == "CONNECT" or route == "ID" or route == "SETSCREEN":
+        show = ["CONNECT", "ID", "SETSCREEN"]
+        if route in show:
             print(f"\033[1;34mDados recebidos: \033[1;32m{data}\n\033[1;34mRota: \033[1;32m{route}\033[0m")
 
         return data, route

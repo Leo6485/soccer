@@ -65,10 +65,10 @@ class Game:
         # cursor_pos = self.player.pos + self.player.cursor.pos
         # cursor_text = self.font.render(f"Cursor: {cursor_pos}", True, (20, 20, 20))
         # self.screen.blit(cursor_text, (10, 40))
-        
+
         # pg.display.flip()
         self.manager.flip()
-        self.clock.tick(200)
+        self.clock.tick(60)
 
     def draw_score(self):
         score_text = f"{self.manager.placar[0]}   {self.manager.placar[1]}"

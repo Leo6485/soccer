@@ -18,7 +18,7 @@ class GamePlayer:
 
 class Ball:
     def __init__(self):
-        self.pos = Vector2(50, 650)
+        self.pos = Vector2(1366/2, 768/2)
         self.vel = Vector2(0, 0)
         self.size = 85
     
@@ -191,111 +191,127 @@ class Game:
 
 respawn_points = [Vector2(100, 100), Vector2(1266, 100), Vector2(100, 668), Vector2(1266, 668)]
 
-app = Server()
-jsonbin.set_ip(app.ip)
-game = Game()
+class App:
+    def __init__(self):
+        self.server = Server()
+        jsonbin.set_ip(self.server.ip)
+        self.game = Game()
+        self.delta_time = 1/60
 
-@app.route("SETSCREEN")
-def set_screen(data, addr):
-    if game.crr_screen != data["crr_screen"]:
-        print(f"Alterando tela para {data['crr_screen']}")
-    game.crr_screen = data["crr_screen"]
+    def run(self):
+        print("\033c", end="\r")
+        self.server.run(wait=False)
+        self.setup_routes()
+        try:
+            self.update()
+        except KeyboardInterrupt:
+            self.server.stop()
+        except Exception:
+            pass
+        self.server.stop()
+    
+    def update(self):
+        while True:
+            try:
+                start = time()
 
-@app.route("CONNECT")
-def connect(data, addr):
-    crr_time = time()
-    player_id = game.get_free_id()
-    if player_id is None:
-        return {"type": "servermsg", "data": {"text": "O servidor está lotado", "error": 1}}
-    if game.crr_screen == "ingame":
-        game.IDs[player_id] = False
-        return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
+                self.game.update(self.delta_time)
+                self.send_updates()
+                sleep(1/120)
 
-    player_data = {
-        "addr": addr,
-        "pos": respawn_points[player_id],
-        "name": data["name"],
-        "id": player_id,
-        "attack_ts": 0,
-        "last_attack": 0,
-        "respawn_ts": crr_time,
-        "last_update": crr_time,
-        "jail_ts": 0,
-        "has_jail": 1,
-        "put_jail_ts": 0
-    }
-    game.players[player_id] = player_data
-    game.clients[player_id] = addr
-    print(f"Novo jogador conectado: {data}")
-    return {"type": "ID", "data": {"id": player_id, "respawn_ts": time()}}
+                end = time()
+                self.delta_time = end - start
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(e)
 
-@app.route("UPDATE")
-def update(data, addr):
-    crr_time = time()
-
-    # Identificação
-    id = data["id"]
-    player = game.players[id]
-
-    player["cursor_pos"] = Vector2(data["cursor_pos"])
-    player["last_update"] = crr_time
-
-    # Recusa no respawn
-    if crr_time - game.players[id].get("respawn_ts", 0) > 1.5 and crr_time - game.players[id].get("jail_ts", 0) > 1.5:
-        player["pos"] = Vector2(data["pos"])
-        player["name"] = data["name"]
-        player["run"] = data["run"]
-        player["dir"] = data["dir"]
-        player["attack_ts"] = data["attack_ts"]
-        player["attack_target"] = data["attack_target"]
-        player["put_jail_ts"] = data["put_jail_ts"]
-
-
-@app.route("QUIT")
-def quit(data, addr):
-    global game, app
-    for c in game.clients.values():
-        app.send({"type": "QUIT"}, c)
-    game = Game()
-    app.stop()
-    _exit(0)
-    print("Reiniciando o servidor...")
-
-@app.route("PING")
-def ping(data, addr):
-    print(f"{data['id']} mandou ping")
-    game.players[data["id"]]["last_update"] = time()
-
-print("/033c", end="\r")
-app.run(wait=False)
-
-def send_updates():
-    data = {
-        "type": "UPDATE",
-        "data": {
-            "crr_screen": game.crr_screen,
-            "ball": [round(i, 2) for i in game.ball.pos],
-            "players": game.players,
-            "IDs": game.IDs,
-            "placar": game.placar
+    def send_updates(self):
+        data = {
+            "type": "UPDATE",
+            "data": {
+                "crr_screen": self.game.crr_screen,
+                "ball": [round(i, 2) for i in self.game.ball.pos],
+                "players": self.game.players,
+                "IDs": self.game.IDs,
+                "placar": self.game.placar
+            }
         }
-    }
-    for id, c in game.clients.items():
-        if game.IDs[id]:
-            app.send(data, c)
+        for id, c in self.game.clients.items():
+            if self.game.IDs[id]:
+                self.server.send(data, c)
 
-delta_time = 1/60
-while True:
-    try:
-        start = time()
-        game.update(delta_time)
-        send_updates()
-        sleep(1/120)
-        end = time()
-        delta_time = end - start
-    except KeyboardInterrupt:
-        break
-    except Exception as e:
-        print(e)
+    def setup_routes(self):
+        @app.server.route("SETSCREEN")
+        def set_screen(data, addr):
+            if self.game.crr_screen != data["crr_screen"]:
+                print(f"Alterando tela para {data['crr_screen']}")
+            self.game.crr_screen = data["crr_screen"]
 
-app.stop()
+        @app.server.route("CONNECT")
+        def connect(data, addr):
+            crr_time = time()
+            player_id = self.game.get_free_id()
+            if player_id is None:
+                return {"type": "servermsg", "data": {"text": "O servidor está lotado", "error": 1}}
+            if self.game.crr_screen == "ingame":
+                self.game.IDs[player_id] = False
+                return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
+
+            player_data = {
+                "addr": addr,
+                "pos": respawn_points[player_id],
+                "name": data["name"],
+                "id": player_id,
+                "attack_ts": 0,
+                "last_attack": 0,
+                "respawn_ts": crr_time,
+                "last_update": crr_time,
+                "jail_ts": 0,
+                "has_jail": 1,
+                "put_jail_ts": 0
+            }
+            self.game.players[player_id] = player_data
+            self.game.clients[player_id] = addr
+            print(f"Novo jogador conectado: {data}")
+            return {"type": "ID", "data": {"id": player_id, "respawn_ts": time()}}
+
+        @app.server.route("UPDATE")
+        def update(data, addr):
+            crr_time = time()
+
+            # Identificação
+            id = data["id"]
+            player = self.game.players[id]
+
+            player["cursor_pos"] = Vector2(data["cursor_pos"])
+            player["last_update"] = crr_time
+
+            # Recusa no respawn
+            if crr_time - self.game.players[id].get("respawn_ts", 0) > 1.5 and crr_time - self.game.players[id].get("jail_ts", 0) > 1.5:
+                player["pos"] = Vector2(data["pos"])
+                player["name"] = data["name"]
+                player["run"] = data["run"]
+                player["dir"] = data["dir"]
+                player["attack_ts"] = data["attack_ts"]
+                player["attack_target"] = data["attack_target"]
+                player["put_jail_ts"] = data["put_jail_ts"]
+
+
+        @app.server.route("QUIT")
+        def quit(data, addr):
+            for c in self.game.clients.values():
+                self.server.send({"type": "QUIT"}, c)
+            self.game = self.game()
+            app.stop()
+            _exit(0)
+            print("Reiniciando o servidor...")
+
+        @app.server.route("PING")
+        def ping(data, addr):
+            print(f"{data['id']} mandou ping")
+            self.game.players[data["id"]]["last_update"] = time()
+
+app = App()
+app.run()
+app.server.stop()

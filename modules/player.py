@@ -124,35 +124,37 @@ class Player(CharacterBaseData):
 
         pg.draw.rect(screen, (0, 100, 0), (x, y, bar_width, bar_height))
         pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
-
     def draw(self, screen):
         crr_time = time()
+        pos_jail = (self.pos.x - 64, self.pos.y - 80)
+        draw_jail = (crr_time - self.jail_ts < 1.5) and self.jail_textures
 
-        draw_jail = crr_time - self.jail_ts < 1.5 and self.jail_textures
         if draw_jail:
-            screen.blit(self.jail_textures[0], (self.pos.x - 64, self.pos.y - 80))
-
+            screen.blit(self.jail_textures[0], pos_jail)
+        
+        # Cursor
         self.cursor.draw(screen, self.pos)
-
+        
+        # Frame do player
         frame_y = 64 if self.cursor.pos.x < 0 else 0
         frame_x = int((crr_time * 6) % 3) * 64 if self.run else 128
-
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (self.pos.x-32, self.pos.y-42), texture_rect)
-
-        # pg.draw.circle(screen, (0, 255, 0), (int(self.pos.x), int(self.pos.y)), self.size)
-        self.weapon.draw(screen, self.pos, self.id, self.cursor.pos, self.attack_ts)
-        # Desenha o nome do player
+        screen.blit(self.texture, (self.pos.x - 32, self.pos.y - 42), texture_rect)
+        
+        # Arma
+        self.weapon.draw(screen, self.pos, self.cursor.pos, self.attack_ts)
+        
+        # Nome
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
         screen.blit(self.name_text, text_rect)
-
-        # Desenha a barra de cooldown
-        progress = min((crr_time - self.last_attack)/0.5, 1)
-        self.draw_progress_bar(screen, progress)
         
-        if draw_jail:
-            screen.blit(self.jail_textures[1], (self.pos.x - 64, self.pos.y - 80))
+        # Barra de cooldown
+        progress = min((crr_time - self.last_attack) / 0.5, 1)
+        self.draw_progress_bar(screen, progress)
 
+        if draw_jail:
+            screen.blit(self.jail_textures[1], pos_jail)
+    
     def reset_name(self, name):
         self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
