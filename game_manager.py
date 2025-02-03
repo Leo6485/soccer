@@ -21,6 +21,7 @@ class GameManager:
         self.player = Player(-1, name)
         self.players = {}
         self.ball = Ball()
+        self.jail_item = pg.Vector2(-1000, -1000)
         self.running = True
 
         self.final_screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
@@ -53,7 +54,7 @@ class GameManager:
 
     def load_player_textures(self):
         texture_path = "assets/textures/player"
-        textures = [pg.image.load(texture_path + "/pato1.png").convert_alpha(), pg.image.load(texture_path + "/pato2.png").convert_alpha()]
+        textures = [pg.image.load(texture_path + "/duck_1.png").convert_alpha(), pg.image.load(texture_path + "/duck_2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 128)) for texture in textures]
     
     def load_jail_textures(self):
@@ -63,7 +64,7 @@ class GameManager:
 
     def load_weapon_textures(self):
         path = "assets/textures/player"
-        textures = [pg.image.load(path + "/shotgun1.png").convert_alpha(), pg.image.load(path + "/shotgun2.png").convert_alpha()]
+        textures = [pg.image.load(path + "/shotgun_1.png").convert_alpha(), pg.image.load(path + "/shotgun_2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 64)) for texture in textures]
 
     def run(self):
@@ -88,6 +89,8 @@ class GameManager:
     def update_game_state(self, data, crr_time):
         self.ball.pos = pg.Vector2(data["ball"])
         self.IDs[:] = data["IDs"]
+        self.jail_item = data["jail_item"]
+
         for player in data["players"].values():
             id = player["id"]
             if id != self.player.id:

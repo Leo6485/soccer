@@ -14,6 +14,7 @@ class MainMenu:
 
         self.start_button = pg.Rect(self.screen.get_width() / 2 - 150, self.screen.get_height() / 2, 300, 60)
         self.name_input_box = pg.Rect(self.screen.get_width() / 2 - 150, self.screen.get_height() / 2 - 100, 300, 60)
+        self.player_windows = [pg.Rect(self.screen.get_width() / 2 - 200 + i * 100, self.screen.get_height() / 2 + 100, 80, 80) for i in range(4)]
 
     def update(self):
         for e in pg.event.get():
@@ -37,25 +38,31 @@ class MainMenu:
             self.app.send(player_data)
 
     def draw(self):
-        # Tela de fundo preta
         self.screen.fill((255, 255, 255))
-        
-        # Título
-        title_text = self.font.render("Digite seu nome", True, (0, 0, 255))
+
+        # Input title
+        title_text = self.font.render("Digite seu nome", True, (0, 100, 0))
         self.screen.blit(title_text, (self.screen.get_width() / 2 - title_text.get_width() / 2, self.screen.get_height() / 4))
         
         if self.manager.server_error:
             server_msg = self.msg_font.render(self.manager.server_msg, True, (255, 0, 0))
             self.screen.blit(server_msg, (self.screen.get_width() / 2 - server_msg.get_width() / 2, self.screen.get_height() / 4 - 100))
-        
-        # Input para o nome
+
+        # Input
         pg.draw.rect(self.screen, (10, 10, 10), self.name_input_box, border_radius=10)
         input_text = self.input_font.render(self.name, True, (255, 255, 255))
         self.screen.blit(input_text, (self.name_input_box.x + 10, self.name_input_box.y + 10))
 
-        pg.draw.rect(self.screen, (0, 255, 0), self.start_button, border_radius=10)
+        pg.draw.rect(self.screen, (0, 100, 0), self.start_button, border_radius=10)
         start_button_text = self.font.render("Jogar", True, (255, 255, 255))
         self.screen.blit(start_button_text, (self.screen.get_width() / 2 - start_button_text.get_width() / 2, self.screen.get_height() / 2))
+
+        for i, window in enumerate(self.player_windows):
+            if self.manager.IDs[i]:
+                texture = self.manager.player_textures[i % 2]
+                scaled_texture = pg.transform.scale(texture.subsurface((0, 0, 64, 40)), (128, 80))
+                self.screen.blit(scaled_texture, window.topleft)
+            # pg.draw.rect(self.screen, (0, 100, 0), window, border_radius=10, width=5)
         
         # pg.display.flip()
         self.manager.flip()

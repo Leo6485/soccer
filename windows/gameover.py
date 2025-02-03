@@ -24,10 +24,24 @@ class GameOver:
         self.app.send(player_data)
 
     def draw(self):
-        self.screen.fill((0, 0, 0))
-        self.draw_background()
-        self.draw_result()
-        self.draw_score()
+        self.screen.fill((255, 255, 255))
+
+        # Result title
+        result = "Vitória" if self.manager.placar[self.manager.player.team] == max(self.manager.placar) else "Derrota"
+        font = self.font_vitoria if result == "Vitória" else self.font_derrota
+        result_text = font.render(result, True, (0, 100, 0))
+        self.screen.blit(result_text, (self.screen_width / 2 - result_text.get_width() / 2, self.screen_height / 4))
+
+        # Score
+        score_text = f"{self.manager.placar[0]} - {self.manager.placar[1]}"
+        score_surface = self.msg_font.render(score_text, True, (255, 255, 0))
+        self.screen.blit(score_surface, (self.screen_width / 2 - score_surface.get_width() / 2, self.screen_height / 2 - 50))
+
+        # Menu button
+        pg.draw.rect(self.screen, (0, 100, 0), self.menu_button, border_radius=10)
+        menu_button_text = self.button_font.render("Menu Principal", True, (255, 255, 255))
+        self.screen.blit(menu_button_text, (self.menu_button.x + self.menu_button.width / 2 - menu_button_text.get_width() / 2, self.menu_button.y + 10))
+
         self.manager.flip()
 
     def draw_background(self):

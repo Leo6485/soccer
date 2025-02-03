@@ -47,6 +47,8 @@ class Game:
         self.screen.blit(self.manager.map_texture, (0, 0))
 
         self.ball.draw(self.screen)
+        
+        pg.draw.circle(self.screen, (200, 25, 255), self.manager.jail_item, 10)
 
         for id, p in self.players.items():
             if id != self.player.id and self.IDs[id]:

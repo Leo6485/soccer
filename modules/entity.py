@@ -31,13 +31,13 @@ class Enemy(CharacterBaseData):
         self.interpolation_lv = 2
 
         self.texture = None
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 50))
 
         self.last_update = time()
     
     def reset_name(self, name):
         self.name = name
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 50))
 
     def update(self):
         crr_time = time()
@@ -59,7 +59,7 @@ class Enemy(CharacterBaseData):
             screen.blit(self.jail_textures[0], pos_jail)
         
         # Nome
-        text_rect = self.name_text.get_rect(center=(pos_x, pos_y - self.size - 10))
+        text_rect = self.name_text.get_rect(center=(pos_x, pos_y - self.size - 15))
         screen.blit(self.name_text, text_rect)
         
         # Frame do player

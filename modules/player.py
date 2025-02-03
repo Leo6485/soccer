@@ -145,7 +145,7 @@ class Player(CharacterBaseData):
         self.weapon.draw(screen, self.pos, self.cursor.pos, self.attack_ts)
         
         # Nome
-        text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 10))
+        text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 15))
         screen.blit(self.name_text, text_rect)
         
         # Barra de cooldown
@@ -157,4 +157,4 @@ class Player(CharacterBaseData):
     
     def reset_name(self, name):
         self.name = name
-        self.name_text = pg.font.Font(None, 25).render(self.name, True, (255, 50, 50))
+        self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
