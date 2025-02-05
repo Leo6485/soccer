@@ -1,5 +1,6 @@
 __pycache__
 modules/__pycache__
-windows/__pycache__
+game_windows/__pycache__
+app/__pycache__
 profile.html
 profile.json
