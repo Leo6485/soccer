@@ -5,7 +5,16 @@ from modules.net import Server
 from pygame import Vector2
 from threading import Lock
 from random import randint
+from modules.entity import CharacterBaseData
 
+class Player(CharacterBaseData):
+    def __init__(self):
+        super().__init__()
+    
+    def in_respawn(self):
+        pass
+    def in_jail(self):
+        pass
 
 class ServerPlayerData:
     def __init__(self, addr, pos, name, id):

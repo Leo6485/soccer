@@ -1,7 +1,7 @@
 import pygame as pg
-from windows.game import Game
-from windows.main_menu import MainMenu
-from windows.gameover import GameOver
+from game_windows.game import Game
+from game_windows.main_menu import MainMenu
+from game_windows.gameover import GameOver
 from modules.player import Player
 from modules.entity import Ball, Enemy
 from modules.weapon import Weapon

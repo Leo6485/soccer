@@ -20,8 +20,11 @@ class CharacterBaseData:
         self.run = 0
         self.dir = 0
         
-        self.weapon = Weapon()
-        self.jail_textures = None
+        # Compatibilidade entre player e enemy
+        self.cursor_pos = pg.Vector2(0, 0)
+        self.attack_target = None
+        self.last_attack = 0
+        self.last_update = time()
 
 class Enemy(CharacterBaseData):
     def __init__(self, id, name):
@@ -35,6 +38,9 @@ class Enemy(CharacterBaseData):
 
         self.last_update = time()
     
+        self.weapon = Weapon()
+        self.jail_textures = None
+
     def reset_name(self, name):
         self.name = name
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 50))

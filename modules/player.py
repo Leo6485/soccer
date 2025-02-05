@@ -54,6 +54,9 @@ class Player(CharacterBaseData):
         self.texture = pg.transform.scale(self.texture, (192, 128))
         
         self.data = {"pos": [0, 0], "id": id}
+        
+        self.weapon = Weapon()
+        self.jail_textures = None
 
     def update(self, pressed, mouse_pressed, ball, players, IDs):
         self.cursor.update()
