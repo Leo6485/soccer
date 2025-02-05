@@ -2,7 +2,7 @@ import traceback
 from os import _exit
 from modules.jsonbin import get_ip
 from modules.net import Client
-from game_manager import GameManager
+from app.game_manager import GameManager
 import pygame as pg
 from time import time
 
