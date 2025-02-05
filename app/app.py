@@ -1,10 +1,12 @@
+import pygame as pg
+
 import traceback
 from os import _exit
+from time import time
+
 from modules.jsonbin import get_ip
 from modules.net import Client
 from app.game_manager import GameManager
-import pygame as pg
-from time import time
 
 # Inicia as rotas do cliente e o game manager
 class App:
