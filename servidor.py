@@ -212,7 +212,7 @@ class Game:
 
                         if randint(1, 2) == 1:
                             self.jail_item.spawn(target)
-                        
+
                         # Limpa efeitos da jail
                         target_player.data["jail_ts"] = 0
 
