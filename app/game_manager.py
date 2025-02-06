@@ -57,7 +57,7 @@ class GameManager:
         texture_path = "assets/textures/player"
         textures = [pg.image.load(texture_path + "/duck_1.png").convert_alpha(), pg.image.load(texture_path + "/duck_2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 128)) for texture in textures]
-    
+
     def load_jail_textures(self):
         texture_path = "assets/textures/items"
         textures = [pg.image.load(texture_path + "/jail_back.png").convert_alpha(), pg.image.load(texture_path + "/jail_front.png").convert_alpha()]

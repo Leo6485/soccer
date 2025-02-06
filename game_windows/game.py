@@ -63,11 +63,6 @@ class Game:
         fps_text = self.font.render(f"FPS: {self.clock.get_fps():.1f}", True, (0, 0, 255))
         self.screen.blit(fps_text, (10, 10))
 
-        # Exibir posição do cursor
-        # cursor_pos = self.player.pos + self.player.cursor.pos
-        # cursor_text = self.font.render(f"Cursor: {cursor_pos}", True, (20, 20, 20))
-        # self.screen.blit(cursor_text, (10, 40))
-
         # pg.display.flip()
         self.manager.flip()
         self.clock.tick(60)

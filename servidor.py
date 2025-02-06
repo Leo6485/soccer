@@ -23,31 +23,6 @@ class Player(CharacterBaseData):
     def in_jail(self):
         return time() - self.jail_ts < 1.5
 
-
-class ServerPlayerData:
-    def __init__(self, addr, pos, name, id):
-        self.data = {
-            "addr": addr,
-            "pos": pos,
-            "name": name,
-            "id": id,
-            "attack_ts": 0,
-            "last_attack": 0,
-            "respawn_ts": time(),
-            "last_update": time(),
-            "jail_ts": 0,
-            "has_jail": 0,
-            "put_jail_ts": 0,
-            "cursor_pos": Vector2(0, 0)
-        }
-        self.lock = Lock()
-
-    def in_respawn(self):
-        return time() - self.data["respawn_ts"] < 1.5
-    
-    def in_jail(self):
-        return time() - self.data["jail_ts"] < 1.5
-
 class Ball:
     def __init__(self):
         self.pos = Vector2(1366/2, 768/2)
