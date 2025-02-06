@@ -19,7 +19,7 @@ class CharacterBaseData:
         # Animações
         self.run = 0
         self.dir = 0
-        
+
         # Compatibilidade entre player e enemy
         self.cursor_pos = pg.Vector2(0, 0)
         self.attack_target = None

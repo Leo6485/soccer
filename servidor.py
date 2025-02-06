@@ -7,14 +7,22 @@ from threading import Lock
 from random import randint
 from modules.entity import CharacterBaseData
 
+
 class Player(CharacterBaseData):
-    def __init__(self):
-        super().__init__()
-    
+    def __init__(self, addr, pos, name, id):
+        super().__init__(id, name)
+        self.pos = pos
+        self.addr = addr
+        self.has_jail = 0
+        self.respawn_ts = time()
+        self.put_jail_ts = 0
+
     def in_respawn(self):
-        pass
+        return time() - self.respawn_ts < 1.5
+
     def in_jail(self):
-        pass
+        return time() - self.jail_ts < 1.5
+
 
 class ServerPlayerData:
     def __init__(self, addr, pos, name, id):
@@ -53,7 +61,7 @@ class Ball:
                 self.update_move(player, delta_time)
     
     def update_move(self, player, delta_time):
-        d, distancia = self.calc_dist(player.data["pos"])
+        d, distancia = self.calc_dist(player.pos)
         if distancia == 0:
             return
         d /= distancia * 1200 * delta_time
@@ -154,7 +162,7 @@ class Game:
         self.crr_screen = "mainmenu"
         self.jail_item.pos = Vector2(-1000, -1000)
         for p_id in self.players.keys():
-            self.players[p_id].data["has_jail"] = 0
+            self.players[p_id].has_jail = 0
 
     def get_free_id(self):
         try:
@@ -183,51 +191,51 @@ class Game:
         self.ball.vel *= 0.98
 
     def check_inactive_player(self, p_id, player, crr_time):
-        if crr_time - player.data.get("last_update", 0) > 1:
+        if crr_time - player.last_update > 1:
             self.IDs[p_id] = False
             if not any(self.IDs):
                 self.restart_server()
 
     def collect_skills(self, p_id, player):
-        if self.jail_item.check(player.data["pos"]):
-            player.data["has_jail"] = 1
+        if self.jail_item.check(player.pos):
+            player.has_jail = 1
 
     def handle_attack(self, p_id, player, crr_time):
         # Ataque
-        att_ts = player.data.get("attack_ts", 0)
-        last_att = player.data.get("last_attack", 0)
-        attack_target = player.data.get("attack_target", None)
+        att_ts = player.attack_ts
+        last_att = player.last_attack
+        attack_target = player.attack_target
         if crr_time - att_ts < 0.5 and att_ts - last_att > 0.5:
             if attack_target is not None:
                 target_player = self.players.get(attack_target)
                 if target_player and not target_player.in_respawn():
-                    target = target_player.data["pos"]
-                    cursor = player.data["cursor_pos"]
+                    target = target_player.pos
+                    cursor = player.cursor_pos
                     distancia = (target - cursor).length()
                     if distancia < 50:
-                        print(f"Player {p_id}:{player.data['id']} atacou player {target_player.data['id']}")
-                        target_id = target_player.data["id"]
-                        target_player.data["pos"] = self.respawn_points[target_id]
-                        target_player.data["respawn_ts"] = crr_time
+                        print(f"Player {p_id}:{player.id} atacou player {target_player.id}")
+                        target_id = target_player.id
+                        target_player.pos = self.respawn_points[target_id]
+                        target_player.respawn_ts = crr_time
 
                         if randint(1, 2) == 1:
                             self.jail_item.spawn(target)
 
                         # Limpa efeitos da jail
-                        target_player.data["jail_ts"] = 0
+                        target_player.jail_ts = 0
 
-            player.data["last_attack"] = crr_time
+            player.last_attack = crr_time
 
         # Jail
-        put_jail_ts = player.data.get("put_jail_ts", 0)
-        has_jail = player.data.get("has_jail", 0)
+        put_jail_ts = player.put_jail_ts
+        has_jail = player.has_jail
         if crr_time - put_jail_ts < 0.5 and has_jail:
-            print(f"Player {player.data['id']} colocou uma jaula")
+            print(f"Player {player.id} colocou uma jaula")
             for other_id, other_player in self.players.items():
-                if other_id == player.data["id"]:
+                if other_id == player.id:
                     continue
-                other_player.data["jail_ts"] = crr_time
-            player.data["has_jail"] = 0
+                other_player.jail_ts = crr_time
+            player.has_jail = 0
 
     def check_goal(self, crr_time):
         gol = False
@@ -245,8 +253,8 @@ class Game:
         # Atualiza o respawn em caso de gol
         if gol:
             for player in self.players.values():
-                player.data["respawn_ts"] = crr_time
-                player.data["pos"] = self.respawn_points[player.data["id"]]
+                player.respawn_ts = crr_time
+                player.pos = self.respawn_points[player.id]
 
     def reset_ball(self):
         self.ball.pos = Vector2(683, 382)
@@ -300,7 +308,7 @@ class App:
             "data": {
                 "crr_screen": self.game.crr_screen,
                 "ball": [round(i, 2) for i in self.game.ball.pos],
-                "players": {p_id: player.data for p_id, player in self.game.players.items()},
+                "players": {p_id: player.__dict__ for p_id, player in self.game.players.items()},
                 "IDs": self.game.IDs,
                 "placar": self.game.placar,
                 "jail_item": self.game.jail_item.pos
@@ -327,7 +335,7 @@ class App:
                 self.game.IDs[player_id] = False
                 return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
 
-            player_data = ServerPlayerData(
+            player_data = Player(
                 addr=addr,
                 pos=self.game.respawn_points[player_id],
                 name=data["name"],
@@ -346,19 +354,18 @@ class App:
             id = data["id"]
             player = self.game.players[id]
 
-            player.data["cursor_pos"] = Vector2(data["cursor_pos"])
-            player.data["last_update"] = crr_time
+            player.cursor_pos = Vector2(data["cursor_pos"])
+            player.last_update = crr_time
 
             # Recusa no respawn
             if not player.in_respawn() and not player.in_jail():
-                player.data["pos"] = Vector2(data["pos"])
-                player.data["name"] = data["name"]
-                player.data["run"] = data["run"]
-                player.data["dir"] = data["dir"]
-                player.data["attack_ts"] = data["attack_ts"]
-                player.data["attack_target"] = data["attack_target"]
-                player.data["put_jail_ts"] = data["put_jail_ts"]
-
+                player.pos = Vector2(data["pos"])
+                player.name = data["name"]
+                player.run = data["run"]
+                player.dir = data["dir"]
+                player.attack_ts = data["attack_ts"]
+                player.attack_target = data["attack_target"]
+                player.put_jail_ts = data["put_jail_ts"]
 
         @app.server.route("QUIT")
         def quit(data, addr):
@@ -371,7 +378,7 @@ class App:
 
         @app.server.route("PING")
         def ping(data, addr):
-            self.game.players[data["id"]].data["last_update"] = time()
+            self.game.players[data["id"]].last_update = time()
 
 app = App()
 app.run()
