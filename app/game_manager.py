@@ -112,10 +112,10 @@ class GameManager:
         if id in self.players:
             enemy = self.players[id]
             enemy.pos = player["pos"]
-            enemy.cursor_pos = player.get("cursor_pos", pg.Vector2(0, 0))
-            enemy.run = player.get("run", 0)
-            enemy.dir = player.get("dir", False)
-            enemy.respawn_ts = player.get("respawn_ts", 0)
+            enemy.cursor_pos = player["cursor_pos"]
+            enemy.run = player["run"]
+            enemy.dir = player["dir"]
+            enemy.respawn_ts = player["respawn_ts"]
             enemy.last_update = crr_time
             enemy.attack_ts = player["attack_ts"]
             enemy.jail_ts = player["jail_ts"]

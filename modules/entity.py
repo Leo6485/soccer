@@ -15,7 +15,9 @@ class CharacterBaseData:
         self.respawn_ts = 0
         self.attack_ts = 0
         self.jail_ts = 0
-        
+        self.respawn_ts = time()
+        self.put_jail_ts = 0
+
         # Animações
         self.run = 0
         self.dir = 0

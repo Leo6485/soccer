@@ -14,8 +14,6 @@ class Player(CharacterBaseData):
         self.pos = pos
         self.addr = addr
         self.has_jail = 0
-        self.respawn_ts = time()
-        self.put_jail_ts = 0
 
     def in_respawn(self):
         return time() - self.respawn_ts < 1.5
