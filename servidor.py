@@ -207,6 +207,7 @@ class Game:
 
         # Limpa efeitos do player alvo
         target_player.skills["jail"]["effect_ts"] = 0
+        target_player.skills["invisibility"]["effect_ts"] = 0
 
 class App:
     def __init__(self):
