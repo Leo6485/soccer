@@ -1,25 +1,12 @@
 from time import sleep, time
 from os import _exit
 import modules.jsonbin as jsonbin
-from modules.net import Server
+from shared.net import Server
 from pygame import Vector2
 from threading import Lock
 from random import randint
 from modules.entity import CharacterBaseData
-
-
-class Player(CharacterBaseData):
-    def __init__(self, addr, pos, name, id):
-        super().__init__(id, name)
-        self.pos = pos
-        self.addr = addr
-        self.has_jail = 0
-
-    def in_respawn(self):
-        return time() - self.respawn_ts < 1.5
-
-    def in_jail(self):
-        return time() - self.jail_ts < 1.5
+from server_modules.player import Player
 
 class Ball:
     def __init__(self):
@@ -90,18 +77,27 @@ class Ball:
         d = pos - self.pos
         return d, d.length()
 
-class JailItem:
+class SkillItem:
     def __init__(self):
         self.pos = Vector2(-1000, -1000)
     
     def check(self, player_pos):
         if self.pos.distance_to(player_pos) < 20:
+            print(self.pos)
             self.pos = Vector2(-1000, -1000)
+            print(f"Habilidade {self.__class__.__name__} coletada")
             return True
         return False
     
     def spawn(self, spawn_pos):
+        print(f"Habilidade {self.__class__.__name__} spawnada na posição {spawn_pos}")
         self.pos = spawn_pos
+    
+class JailItem(SkillItem):
+    pass
+
+class InvisibilityItem(SkillItem):
+    pass
 
 class Game:
     def __init__(self):
@@ -115,6 +111,7 @@ class Game:
 
         self.ball = Ball()
         self.jail_item = JailItem()
+        self.invisibility_item = InvisibilityItem()
 
         self.display = Vector2(1366, 768)
         self.placar = [0, 0]
@@ -135,7 +132,8 @@ class Game:
         self.crr_screen = "mainmenu"
         self.jail_item.pos = Vector2(-1000, -1000)
         for p_id in self.players.keys():
-            self.players[p_id].has_jail = 0
+            self.players[p_id].skills["jail"]["has"] = 0
+            self.players[p_id].skills["invisibility"]["has"] = 0
 
     def get_free_id(self):
         try:
@@ -153,62 +151,16 @@ class Game:
         self.update_screen(crr_time)
 
     def update_players(self, crr_time):
-        for p_id, player in self.players.items():
-            self.check_inactive_player(p_id, player, crr_time)
-            self.handle_attack(p_id, player, crr_time)
-            self.collect_skills(p_id, player)
+        for player in self.players.values():
+            player.check_inactive(crr_time, self)
+            player.handle_attack(crr_time, self)
+            player.handle_skills(crr_time, self)
+            player.collect_skills(self)
 
     def update_ball(self, delta_time):
         self.ball.update(self.players, self.display, self.IDs, delta_time)
         self.ball.pos += self.ball.vel
         self.ball.vel *= 0.98
-
-    def check_inactive_player(self, p_id, player, crr_time):
-        if crr_time - player.last_update > 1:
-            self.IDs[p_id] = False
-            if not any(self.IDs):
-                self.restart_server()
-
-    def collect_skills(self, p_id, player):
-        if self.jail_item.check(player.pos):
-            player.has_jail = 1
-
-    def handle_attack(self, p_id, player, crr_time):
-        # Ataque
-        att_ts = player.attack_ts
-        last_att = player.last_attack
-        attack_target = player.attack_target
-        if crr_time - att_ts < 0.5 and att_ts - last_att > 0.5:
-            if attack_target is not None:
-                target_player = self.players.get(attack_target)
-                if target_player and not target_player.in_respawn():
-                    target = target_player.pos
-                    cursor = player.cursor_pos
-                    distancia = (target - cursor).length()
-                    if distancia < 50:
-                        print(f"Player {p_id}:{player.id} atacou player {target_player.id}")
-                        target_id = target_player.id
-                        target_player.pos = self.respawn_points[target_id]
-                        target_player.respawn_ts = crr_time
-
-                        if randint(1, 2) == 1:
-                            self.jail_item.spawn(target)
-
-                        # Limpa efeitos da jail
-                        target_player.jail_ts = 0
-
-            player.last_attack = crr_time
-
-        # Jail
-        put_jail_ts = player.put_jail_ts
-        has_jail = player.has_jail
-        if crr_time - put_jail_ts < 0.5 and has_jail:
-            print(f"Player {player.id} colocou uma jaula")
-            for other_id, other_player in self.players.items():
-                if other_id == player.id:
-                    continue
-                other_player.jail_ts = crr_time
-            player.has_jail = 0
 
     def check_goal(self, crr_time):
         gol = False
@@ -239,6 +191,22 @@ class Game:
             self.game_end_ts = crr_time
         if self.crr_screen == "gameover" and crr_time - self.game_end_ts > 5:
             self.restart()
+
+    def kill(self, player_id, crr_time):
+        target_player = self.players[player_id]
+        
+        print(f"Target player pos: {target_player.pos}")
+        op = randint(1, 4)
+        if op == 2:
+            self.jail_item.spawn(target_player.pos)
+        elif op == 4:
+            self.invisibility_item.spawn(target_player.pos)
+        
+        target_player.pos = self.respawn_points[player_id]
+        target_player.respawn_ts = crr_time
+
+        # Limpa efeitos do player alvo
+        target_player.skills["jail"]["effect_ts"] = 0
 
 class App:
     def __init__(self):
@@ -284,7 +252,7 @@ class App:
                 "players": {p_id: player.__dict__ for p_id, player in self.game.players.items()},
                 "IDs": self.game.IDs,
                 "placar": self.game.placar,
-                "jail_item": self.game.jail_item.pos
+                "skills_items": {"jail": self.game.jail_item.pos, "invisibility": self.game.invisibility_item.pos}
             }
         }
         for id, c in self.game.clients.items():
@@ -338,7 +306,7 @@ class App:
                 player.dir = data["dir"]
                 player.attack_ts = data["attack_ts"]
                 player.attack_target = data["attack_target"]
-                player.put_jail_ts = data["put_jail_ts"]
+                player.skills = data["skills"]
 
         @app.server.route("QUIT")
         def quit(data, addr):

@@ -2,5 +2,7 @@ __pycache__
 modules/__pycache__
 game_windows/__pycache__
 app/__pycache__
+server_modules/__pycache__
+shared/__pycache__
 profile.html
 profile.json

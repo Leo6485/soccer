@@ -2,31 +2,7 @@ import pygame as pg
 from math import sqrt
 from time import time
 from modules.weapon import Weapon
-
-class CharacterBaseData:
-    def __init__(self, id, name):
-        self.size = 25
-        self.pos = pg.Vector2(100, 100)
-        self.id = id
-        self.name = name
-        self.team = self.id%2
-        
-        # Timestamps
-        self.respawn_ts = 0
-        self.attack_ts = 0
-        self.jail_ts = 0
-        self.respawn_ts = time()
-        self.put_jail_ts = 0
-
-        # Animações
-        self.run = 0
-        self.dir = 0
-
-        # Compatibilidade entre player e enemy
-        self.cursor_pos = pg.Vector2(0, 0)
-        self.attack_target = None
-        self.last_attack = 0
-        self.last_update = time()
+from shared.character import CharacterBaseData
 
 class Enemy(CharacterBaseData):
     def __init__(self, id, name):
@@ -56,12 +32,16 @@ class Enemy(CharacterBaseData):
 
     def draw(self, screen, player_pos=pg.Vector2(-1000, -1000)):
         crr_time = time()
+
+        if crr_time - self.skills["invisibility"]["effect_ts"] < 4:
+            return
+
         distance = (self.interpolated_pos - player_pos).length()
         opacity = 128 if distance < 80 else 255
 
         pos_x, pos_y = self.interpolated_pos.x, self.interpolated_pos.y
         pos_jail = (pos_x - 64, pos_y - 80)
-        draw_jail = (crr_time - self.jail_ts < 1.5) and self.jail_textures
+        draw_jail = (crr_time - self.skills["jail"]["effect_ts"] < 1.5) and self.jail_textures
 
         if draw_jail:
             screen.blit(self.jail_textures[0], pos_jail)

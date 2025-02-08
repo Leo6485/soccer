@@ -1,7 +1,7 @@
 import pygame as pg
 from time import time
 from modules.weapon import Weapon
-from modules.entity import CharacterBaseData
+from shared.character import CharacterBaseData
 
 pg.init()
 d = pg.display.Info()
@@ -45,8 +45,6 @@ class Player(CharacterBaseData):
 
         self.last_attack = 0
         self.attack_target = None
-        self.has_jail = 0
-        self.put_jail_ts = 0
         self.cursor = Cursor()
 
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
@@ -60,9 +58,9 @@ class Player(CharacterBaseData):
 
     def update(self, pressed, mouse_pressed, ball, players, IDs):
         self.cursor.update()
-        
+
         self.dir = self.cursor.pos.x < 0
-        self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5 and time() - self.jail_ts > 1.5)
+        self.run = pressed[pg.K_w] and (time() - self.respawn_ts > 1.5 and time() - self.skills["jail"]["effect_ts"] > 1.5)
         if self.run:
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
@@ -101,8 +99,11 @@ class Player(CharacterBaseData):
                 self.last_attack = self.attack_ts
         
         if pressed[pg.K_d]:
-            if self.has_jail:
-                self.put_jail_ts = time()
+            if self.skills["jail"]["has"]:
+                self.skills["jail"]["use_ts"] = time()
+        if pressed[pg.K_s]:
+            if self.skills["invisibility"]["has"]:
+                self.skills["invisibility"]["use_ts"] = time()
 
         self.update_data()
 
@@ -116,7 +117,7 @@ class Player(CharacterBaseData):
                         "run": self.run,
                         "dir": self.dir,
                         "name": self.name,
-                        "put_jail_ts": self.put_jail_ts
+                        "skills": self.skills
                      }
 
     def draw_progress_bar(self, screen, progress):
@@ -130,7 +131,7 @@ class Player(CharacterBaseData):
     def draw(self, screen):
         crr_time = time()
         pos_jail = (self.pos.x - 64, self.pos.y - 80)
-        draw_jail = (crr_time - self.jail_ts < 1.5) and self.jail_textures
+        draw_jail = (crr_time - self.skills["jail"]["effect_ts"] < 1.5) and self.jail_textures
 
         if draw_jail:
             screen.blit(self.jail_textures[0], pos_jail)
@@ -142,7 +143,9 @@ class Player(CharacterBaseData):
         frame_y = 64 if self.cursor.pos.x < 0 else 0
         frame_x = int((crr_time * 6) % 3) * 64 if self.run else 128
         texture_rect = pg.Rect(frame_x, frame_y, 64, 64)
-        screen.blit(self.texture, (self.pos.x - 32, self.pos.y - 42), texture_rect)
+        
+        if not (crr_time - self.skills["invisibility"]["effect_ts"] < 4):
+            screen.blit(self.texture, (self.pos.x - 32, self.pos.y - 42), texture_rect)
         
         # Arma
         self.weapon.draw(screen, self.pos, self.cursor.pos, self.attack_ts)

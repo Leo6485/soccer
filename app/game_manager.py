@@ -23,7 +23,7 @@ class GameManager:
         self.player = Player(-1, name)
         self.players = {}
         self.ball = Ball()
-        self.jail_item = pg.Vector2(-1000, -1000)
+        self.skills_items = {"jail": pg.Vector2(-1000, -1000), "invisibility": pg.Vector2(-1000, -1000)}
         self.running = True
         
         # Telas
@@ -106,7 +106,7 @@ class GameManager:
     def update_game_state(self, data, crr_time):
         self.ball.pos = pg.Vector2(data["ball"])
         self.IDs[:] = data["IDs"]
-        self.jail_item = data["jail_item"]
+        self.skills_items = data["skills_items"]
 
         for player in data["players"].values():
             id = player["id"]
@@ -114,11 +114,10 @@ class GameManager:
                 self.update_enemies(player, id, crr_time)
             else:
                 self.player.respawn_ts = player["respawn_ts"]
-                self.player.jail_ts = player["jail_ts"]
-                self.player.has_jail = player["has_jail"]
+                self.player.skills = player["skills"]
 
                 # O Servidor controla a posição nessas situações
-                if crr_time - player["respawn_ts"] < 1.5 or crr_time - player["jail_ts"] < 1.5:
+                if crr_time - player["respawn_ts"] < 1.5 or crr_time - player["skills"]["jail"]["effect_ts"] < 1.5:
                     self.player.pos = player["pos"]
 
         self.placar[:] = data["placar"]
@@ -134,7 +133,7 @@ class GameManager:
             enemy.respawn_ts = player["respawn_ts"]
             enemy.last_update = crr_time
             enemy.attack_ts = player["attack_ts"]
-            enemy.jail_ts = player["jail_ts"]
+            enemy.skills = player["skills"]
             if crr_time - enemy.respawn_ts < 1:
                 enemy.reset_name(player["name"])
             if enemy.name != player["name"]:

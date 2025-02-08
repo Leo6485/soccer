@@ -1,7 +1,7 @@
 import pygame as pg
 from time import time
 import modules.jsonbin as jsonbin
-from modules.net import Client
+from shared.net import Client
 from modules.entity import Enemy, Ball
 from modules.player import Player
 import traceback
