@@ -11,6 +11,7 @@ pg.init()
 pg.mouse.set_visible(1)
 d = pg.display.Info()
 DW, DH = d.current_w, d.current_h
+print(DW, DH)
 del d
 
 class GameManager:
@@ -24,29 +25,44 @@ class GameManager:
         self.ball = Ball()
         self.jail_item = pg.Vector2(-1000, -1000)
         self.running = True
-
-        self.final_screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
-        self.screen = pg.Surface((1366, 768))
+        
+        # Telas
+        res = min((1366, 768), (DW, DH))
+        self.final_screen = pg.display.set_mode(res, pg.FULLSCREEN, pg.RESIZABLE)
+        self.screen = pg.Surface((1366, 768)).convert()
+        
+        # Carrega as texturas
         self.map_texture = self.load_map_texture()
         self.player_textures = self.load_player_textures()
         self.weapon_textures = self.load_weapon_textures()
         self.jail_textures = self.load_jail_textures()
 
+        # Display design e escalas
+        self.D = pg.Vector2(res)
         self.DD = pg.Vector2(1366, 768)
-        self.scale = min(DW / self.DD.x, DH / self.DD.y)
-        self.padding = pg.Vector2((DW - self.DD.x * self.scale) / 2, (DH - self.DD.y * self.scale) / 2)
-        
+        self.scale = min(self.D.x / self.DD.x, self.D.y / self.DD.y)
+        self.padding = pg.Vector2((self.D.x - self.DD.x * self.scale) / 2, (self.D.y - self.DD.y * self.scale) / 2)
+
+        print(f"Resolução: {res}")
+        print(f"Escala: {self.scale}")
+
+        # Servidor e primeira conexão
         self.server_msg = ""
         self.server_error = 0
         data = {"type": "CONNECT", "data": {"name": self.player.name}}
         self.app.send(data)
+        
+        # Janelas
         self.game = Game(self.app, self)
         self.main_menu = MainMenu(self.app, self)
         self.gameover = GameOver(self.app, self)
-    
+
     def flip(self):
-        frame = pg.transform.scale(self.screen, (DW, DH))
-        self.final_screen.blit(frame, self.padding)
+        if self.scale < 1:
+            frame = pg.transform.scale(self.screen, (self.DD.x*self.scale, self.DD.y*self.scale))
+            self.final_screen.blit(frame, self.padding)
+        else:
+            self.final_screen.blit(self.screen, self.padding)
         pg.display.flip()
 
     def load_map_texture(self):
@@ -54,7 +70,7 @@ class GameManager:
         return pg.transform.scale(map_texture, (1366, 768))
 
     def load_player_textures(self):
-        texture_path = "assets/textures/player"
+        texture_path = "assets/textures/player/v2"
         textures = [pg.image.load(texture_path + "/duck_1.png").convert_alpha(), pg.image.load(texture_path + "/duck_2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 128)) for texture in textures]
 
@@ -64,7 +80,7 @@ class GameManager:
         return [pg.transform.scale(texture, (128, 128)) for texture in textures]
 
     def load_weapon_textures(self):
-        path = "assets/textures/player"
+        path = "assets/textures/player/v2"
         textures = [pg.image.load(path + "/shotgun_1.png").convert_alpha(), pg.image.load(path + "/shotgun_2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 64)) for texture in textures]
 
@@ -100,7 +116,7 @@ class GameManager:
                 self.player.respawn_ts = player["respawn_ts"]
                 self.player.jail_ts = player["jail_ts"]
                 self.player.has_jail = player["has_jail"]
-                
+
                 # O Servidor controla a posição nessas situações
                 if crr_time - player["respawn_ts"] < 1.5 or crr_time - player["jail_ts"] < 1.5:
                     self.player.pos = player["pos"]

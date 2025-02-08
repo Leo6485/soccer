@@ -50,7 +50,7 @@ class Player(CharacterBaseData):
         self.cursor = Cursor()
 
         self.name_text = pg.font.Font(None, 25).render(self.name, True, (50, 50, 255))
-        self.texture = pg.image.load(f"assets/textures/player/duck_{self.team}.png")
+        self.texture = pg.image.load(f"assets/textures/player/v2/duck_{self.team}.png")
         self.texture = pg.transform.scale(self.texture, (192, 128))
         
         self.data = {"pos": [0, 0], "id": id}

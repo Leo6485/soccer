@@ -23,7 +23,10 @@ class MainMenu:
 
             if e.type == pg.MOUSEBUTTONDOWN:
                 pos = pg.Vector2([int(pos/self.manager.scale) for pos in e.pos])
+                pos -= self.manager.padding
+                print(pos, self.start_button.x, self.start_button.y)
                 if self.start_button.collidepoint(pos) and not self.manager.server_error:
+                    print("Started")
                     self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame", "name": self.name}})
                     self.running = False
 
