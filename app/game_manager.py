@@ -36,6 +36,8 @@ class GameManager:
         self.player_textures = self.load_player_textures()
         self.weapon_textures = self.load_weapon_textures()
         self.jail_textures = self.load_jail_textures()
+        self.UI_player_textures = self.load_UI_player_textures()
+        self.UI_start_button_texture = self.load_UI_start_button()
 
         # Display design e escalas
         self.D = pg.Vector2(res)
@@ -84,6 +86,19 @@ class GameManager:
         textures = [pg.image.load(path + "/shotgun_1.png").convert_alpha(), pg.image.load(path + "/shotgun_2.png").convert_alpha()]
         return [pg.transform.scale(texture, (192, 64)) for texture in textures]
 
+    def load_UI_player_textures(self):
+        texture_path = "assets/textures/UI"
+        textures = [
+            pg.image.load(texture_path + "/UI_duck_1.png").convert_alpha(),
+            pg.image.load(texture_path + "/UI_duck_2.png").convert_alpha()
+        ]
+        return [pg.transform.scale(texture, (2048, 256)) for texture in textures]
+    
+    def load_UI_start_button(self):
+        texture_path = "assets/textures/UI/start_button.png"
+        texture = pg.image.load(texture_path).convert_alpha()
+        return pg.transform.scale(texture, (768, 128))
+    
     def run(self):
         self.clock = pg.time.Clock()
         while self.running:
