@@ -217,7 +217,6 @@ class App:
         self.delta_time = 1/60
 
     def run(self):
-        print("\033c", end="\r")
         self.server.run(wait=False)
         self.setup_routes()
         try:

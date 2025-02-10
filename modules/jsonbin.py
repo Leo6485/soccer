@@ -21,6 +21,7 @@ def set_ip(ip):
 
 def get_ip():
     try:
+        assert False
         response = requests.get(API_URL + "/latest").json()
         return response["record"]["server_ip"] or "Erro"
     except Exception as e:
