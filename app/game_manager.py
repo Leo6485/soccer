@@ -27,8 +27,8 @@ class GameManager:
         self.running = True
         
         # Telas
-        res = min((1366, 768), (DW, DH))
-        self.final_screen = pg.display.set_mode(res, pg.FULLSCREEN, pg.RESIZABLE)
+        res = max((1366, 768), (DW, DH))
+        self.final_screen = pg.display.set_mode(res, pg.FULLSCREEN)
         self.screen = pg.Surface((1366, 768)).convert()
         
         # Carrega as texturas
@@ -60,7 +60,7 @@ class GameManager:
         self.gameover = GameOver(self.app, self)
 
     def flip(self):
-        if self.scale < 1:
+        if 1:
             frame = pg.transform.scale(self.screen, (self.DD.x*self.scale, self.DD.y*self.scale))
             self.final_screen.blit(frame, self.padding)
         else:
