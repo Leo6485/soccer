@@ -10,7 +10,7 @@ from modules.entity import Ball, Enemy
 pg.init()
 pg.mouse.set_visible(1)
 d = pg.display.Info()
-DW, DH = d.current_w, d.current_h
+DW, DH = min((1366, 768), (d.current_w, d.current_h))
 print(DW, DH)
 del d
 
@@ -115,7 +115,7 @@ class GameManager:
                 self.main_menu.update()
                 self.main_menu.draw()
 
-            pg.mouse.set_visible(0)
+            # pg.mouse.set_v60isible(0)
             while self.crr_screen == "ingame" and self.running:
                 self.game.update()
                 self.game.draw()

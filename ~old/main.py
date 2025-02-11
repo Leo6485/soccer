@@ -11,7 +11,7 @@ from threading import Lock
 pg.init()
 pg.mouse.set_visible(0)
 d = pg.display.Info()
-DW, DH = d.current_w, d.current_h
+DW, DH = min((1366, 768), (d.current_w, d.current_h))
 del d
 
 GREEN = (0, 255, 0)

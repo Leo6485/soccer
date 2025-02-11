@@ -5,7 +5,8 @@ from shared.character import CharacterBaseData
 
 pg.init()
 d = pg.display.Info()
-DW, DH = d.current_w, d.current_h
+DW, DH = min((1366, 768), (d.current_w, d.current_h))
+
 del d
 
 class Cursor:
