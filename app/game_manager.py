@@ -54,6 +54,10 @@ class GameManager:
         self.UI_player_textures = self.load_UI_player_textures()
         self.UI_start_button_texture = self.load_UI_start_button()
 
+        pg.mixer.init()
+        self.music = pg.mixer.music.load("assets/sounds/letx27s-get-this-done-154533.mp3")
+        pg.mixer.music.play()
+
         print(f"Resolução: {res}")
         print(f"Escala: {self.scale}")
 
