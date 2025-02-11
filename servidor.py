@@ -132,8 +132,11 @@ class Game:
         self.crr_screen = "mainmenu"
         self.jail_item.pos = Vector2(-1000, -1000)
         for p_id in self.players.keys():
-            self.players[p_id].skills["jail"] = [0, 0, 0]
-            self.players[p_id].skills["invisibility"] = [0, 0, 0]
+            self.players[p_id].skills = {
+                       "jail": {"has": 0, "use_ts": 0, "effect_ts": 0},
+                       "invisibility": {"has": 0, "use_ts": 0, "effect_ts": 0}
+                      }
+
 
     def get_free_id(self):
         try:

@@ -115,7 +115,7 @@ class GameManager:
                 self.main_menu.update()
                 self.main_menu.draw()
 
-            # pg.mouse.set_v60isible(0)
+            pg.mouse.set_visible(0)
             while self.crr_screen == "ingame" and self.running:
                 self.game.update()
                 self.game.draw()
