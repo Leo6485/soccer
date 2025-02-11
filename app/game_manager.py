@@ -120,6 +120,9 @@ class GameManager:
                 self.main_menu.draw()
 
             pg.mouse.set_visible(0)
+            pg.mixer.music.stop()
+            pg.mixer.music.load("assets/sounds/brutal.mp3")
+            pg.mixer.music.play()
             while self.crr_screen == "ingame" and self.running:
                 self.game.update()
                 self.game.draw()
