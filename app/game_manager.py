@@ -27,23 +27,32 @@ class GameManager:
         self.running = True
         
         # Telas
-        res = max((1366, 768), (DW, DH))
-        self.final_screen = pg.display.set_mode(res, pg.FULLSCREEN)
+        
+        # Resoluções de (1366, 768) para baixo
+        res = min((1366, 768), (DW, DH))
+        self.final_screen = pg.display.set_mode(res, pg.SCALED | pg.FULLSCREEN)
         self.screen = pg.Surface((1366, 768)).convert()
         
-        # Carrega as texturas
+        self.screen = pg.display.set_mode(res, pg.SCALED | pg.FULLSCREEN)
+        
+        
+        # Display design e escalas
+        self.D = pg.Vector2(res)
+        self.DD = pg.Vector2(1366, 768)
+        self.scale = min(self.D.x / self.DD.x, self.D.y / self.DD.y)
+        self.padding = pg.Vector2((self.D.x - self.DD.x * self.scale) / 2, (self.D.y - self.DD.y * self.scale) / 2)
+        
+        # Se for menor do que 1, preciso desenhar em uma surface para reescalar posteriormente
+        if self.scale < 1:
+            self.screen = pg.Surface((1366, 768)).convert()
+
+        # Carrega as texturasPa
         self.map_texture = self.load_map_texture()
         self.player_textures = self.load_player_textures()
         self.weapon_textures = self.load_weapon_textures()
         self.jail_textures = self.load_jail_textures()
         self.UI_player_textures = self.load_UI_player_textures()
         self.UI_start_button_texture = self.load_UI_start_button()
-
-        # Display design e escalas
-        self.D = pg.Vector2(res)
-        self.DD = pg.Vector2(1366, 768)
-        self.scale = min(self.D.x / self.DD.x, self.D.y / self.DD.y)
-        self.padding = pg.Vector2((self.D.x - self.DD.x * self.scale) / 2, (self.D.y - self.DD.y * self.scale) / 2)
 
         print(f"Resolução: {res}")
         print(f"Escala: {self.scale}")
@@ -60,11 +69,9 @@ class GameManager:
         self.gameover = GameOver(self.app, self)
 
     def flip(self):
-        if 1:
+        if self.scale < 1:
             frame = pg.transform.scale(self.screen, (self.DD.x*self.scale, self.DD.y*self.scale))
             self.final_screen.blit(frame, self.padding)
-        else:
-            self.final_screen.blit(self.screen, self.padding)
         pg.display.flip()
 
     def load_map_texture(self):
