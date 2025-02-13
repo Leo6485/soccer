@@ -24,6 +24,7 @@ class GameManager:
         self.players = {}
         self.ball = Ball()
         self.skills_items = {"jail": pg.Vector2(-1000, -1000), "invisibility": pg.Vector2(-1000, -1000)}
+        self.skulls_points = [[pg.Vector2(-10000, -10000), 0] for i in range(4)]
         self.running = True
         
         # Telas
@@ -124,6 +125,7 @@ class GameManager:
         self.ball.pos = pg.Vector2(data["ball"])
         self.IDs[:] = data["IDs"]
         self.skills_items = data["skills_items"]
+        self.skulls_points = data["skulls_points"]
 
         for player in data["players"].values():
             id = player["id"]

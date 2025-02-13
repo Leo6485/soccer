@@ -108,6 +108,7 @@ class Game:
         self.players = {}
         self.clients = {}
         self.IDs = [False] * 4
+        self.skulls_points = [[Vector2(-10000, -10000), 0] for i in range(4)]
 
         self.ball = Ball()
         self.jail_item = JailItem()
@@ -205,6 +206,7 @@ class Game:
         elif op == 4:
             self.invisibility_item.spawn(target_player.pos)
         
+        self.skulls_points[player_id] = [target_player.pos, crr_time]        
         target_player.pos = self.respawn_points[player_id]
         target_player.respawn_ts = crr_time
 
@@ -255,7 +257,8 @@ class App:
                 "players": {p_id: player.__dict__ for p_id, player in self.game.players.items()},
                 "IDs": self.game.IDs,
                 "placar": self.game.placar,
-                "skills_items": {"jail": self.game.jail_item.pos, "invisibility": self.game.invisibility_item.pos}
+                "skills_items": {"jail": self.game.jail_item.pos, "invisibility": self.game.invisibility_item.pos},
+                "skulls_points": self.game.skulls_points
             }
         }
         for id, c in self.game.clients.items():

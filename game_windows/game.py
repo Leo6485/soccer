@@ -52,8 +52,14 @@ class Game:
 
         self.ball.draw(self.screen)
         
+        # Desenha os coletáveis das habilidades
         pg.draw.circle(self.screen, (200, 25, 255), self.manager.skills_items["jail"], 10)
         pg.draw.circle(self.screen, (255, 255, 25), self.manager.skills_items["invisibility"], 10)
+        
+        # Desenha uma caveira onde os players morreram
+        for i in self.manager.skulls_points:
+            if time() - i[1] < 1.5:
+                pg.draw.circle(self.screen, (50, 50, 50), i[0], 32)
 
         for id, p in self.players.items():
             if id != self.player.id and self.IDs[id]:
