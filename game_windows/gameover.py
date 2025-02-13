@@ -33,8 +33,9 @@ class GameOver:
 
     def draw(self):
         self.screen.fill((80, 80, 80))
+        
+        self.screen.blit(self.manager.UI_background, (0, 0))
 
-        self.draw_background()
         self.draw_result()
         self.draw_score()
         self.draw_countdown()
@@ -46,12 +47,6 @@ class GameOver:
             self.screen.blit(scaled_texture, window.topleft)
 
         self.manager.flip()
-
-    def draw_background(self):
-        for i in range(0, self.screen_width + 1, self.screen_width // 16):
-            pg.draw.line(self.screen, (0, 255, 255), (i, 0), (i, self.screen_height), 1)
-        for i in range(0, self.screen_height + 1, self.screen_height // 9):
-            pg.draw.line(self.screen, (0, 255, 255), (0, i), (self.screen_width, i), 1)
 
     def draw_result(self):
         result = "Vitória" if self.manager.placar[self.manager.player.team] == max(self.manager.placar) else "Derrota"

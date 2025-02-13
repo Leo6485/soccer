@@ -1,1 +1,12 @@
-{}
+{
+    "files.exclude": {
+        "**/__pycache__": true,
+        "modules/__pycache__": true,
+        "game_windows/__pycache__": true,
+        "app/__pycache__": true,
+        "server_modules/__pycache__": true,
+        "shared/__pycache__": true,
+        "**/profile.html": true,
+        "**/profile.json": true
+    }
+}

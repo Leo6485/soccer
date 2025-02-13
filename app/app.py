@@ -36,6 +36,10 @@ class App:
             self.game_manager.player.id = data["id"]
             self.game_manager.player.texture = self.game_manager.player_textures[data["id"] % 2]
             self.game_manager.player.weapon.texture = self.game_manager.weapon_textures[data["id"] % 2]
+            self.game_manager.player.weapon.sound =self.game_manager.shotgun_sound
+            
+            self.game_manager.player.granade.texture = self.game_manager.granade
+
             self.game_manager.player.jail_textures = self.game_manager.jail_textures
             self.game_manager.players[data["id"]] = self.game_manager.player
             self.game_manager.player.team = self.game_manager.player.id % 2

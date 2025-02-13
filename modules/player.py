@@ -1,6 +1,7 @@
 import pygame as pg
 from time import time
 from modules.weapon import Weapon
+from modules.weapon import Granade
 from shared.character import CharacterBaseData
 
 pg.init()
@@ -55,6 +56,7 @@ class Player(CharacterBaseData):
         self.data = {"pos": [0, 0], "id": id}
         
         self.weapon = Weapon()
+        self.granade = Granade()
         self.jail_textures = None
 
     def update(self, pressed, mouse_pressed, ball, players, IDs):
@@ -66,6 +68,8 @@ class Player(CharacterBaseData):
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
         
+        if time() - self.attack_ts  < 0.1 and not self.run:
+            self.pos -= self.cursor.delta * 0.02
         ########## Reage com a bola ##########
         coll = ball.calc_dist(self.pos)
 
@@ -99,12 +103,19 @@ class Player(CharacterBaseData):
                 self.attack_ts = time()
                 self.last_attack = self.attack_ts
         
+        # Habilidades
         if pressed[pg.K_d]:
             if self.skills["jail"]["has"]:
                 self.skills["jail"]["use_ts"] = time()
         if pressed[pg.K_s]:
             if self.skills["invisibility"]["has"]:
                 self.skills["invisibility"]["use_ts"] = time()
+        
+        if pressed[pg.K_e]:
+            self.granade.launch_ts = time()
+            self.granade.pos = self.pos + (1, 1)
+            self.granade.launch_pos = self.pos + (2, 2)
+            self.granade.vel = pg.Vector2(self.cursor.pos.x / 4, self.cursor.pos.y / 4)
 
         self.update_data()
 
@@ -151,6 +162,9 @@ class Player(CharacterBaseData):
         # Arma
         self.weapon.draw(screen, self.pos, self.cursor.pos, self.attack_ts)
         
+        # Granada
+        self.granade.draw(screen, self.pos, self.cursor.pos, self.attack_ts)
+
         # Nome
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 15))
         screen.blit(self.name_text, text_rect)

@@ -53,7 +53,7 @@ class Panel:
 
         # Input
         self.input_box.centerx = self.center_x
-        pg.draw.rect(self.screen, (10, 10, 10), self.input_box, border_radius=10)
+        pg.draw.rect(self.screen, (50, 50, 80), self.input_box, border_radius=0)
         input_text = self.input_font.render(name, True, (255, 255, 255))
         input_x = self.input_box.x + 10
         self.screen.blit(input_text, (input_x, self.input_box.y + 10))
@@ -81,21 +81,24 @@ class MainMenu:
         self.running = True
 
         self.start_button = Button(pg.Rect(850, 500, 256, 128), self.manager.UI_start_button_texture)
-        self.name_input_box = pg.Rect(850, 350, 300, 60)
+        self.name_input_box = pg.Rect(850, 350, 350, 60)
         self.panel = Panel(self.screen, "Digite seu nome", self.font, self.name_input_box, self.input_font, self.start_button, center_x=1000)
         self.player_windows = [pg.Rect(100 + (i % 2) * 300, 100 + (i // 2) * 300, 80, 80) for i in range(4)]
-        
+
         self.frame = [0] * 4
 
     def handle_events(self, event_list):
         for event in event_list:
             if event.type == pg.QUIT:
-                self.running = False
+                self.manager.running = False
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_BACKSPACE:
                     self.name = self.name[:-1]
                 else:
                     self.name += event.unicode
+        
+        if pg.key.get_pressed()[pg.K_ESCAPE]:
+            self.manager.running = False
 
     def update(self):
         event_list = pg.event.get()
@@ -112,11 +115,15 @@ class MainMenu:
     def draw(self):
         self.screen.fill((80, 80, 80))
 
+        self.screen.blit(self.manager.UI_background, (0, 0))
+
         self.panel.draw(self.name, self.manager.server_error, self.manager.server_msg)
 
         for i, window in enumerate(self.player_windows):
             if self.manager.IDs[i]:
                 self.frame[i] += (self.frame[i] < 7) * 0.5
+            else:
+                self.frame[i] -= (self.frame[i] >= 0) * 0.5
 
             texture = self.manager.UI_player_textures[i % 2]
             offset_x = 256 * int(self.frame[i])
