@@ -44,8 +44,7 @@ class GameOver:
             if self.winner:
                 self.manager.win_sound.play()
             else:
-                i = randint(0, 1)
-                self.manager.defeat_sound[i].play()
+                self.manager.defeat_sound[0].play()
             self.play_sound_ts = time()
 
         self.draw_result()

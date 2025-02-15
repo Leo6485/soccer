@@ -199,9 +199,9 @@ class Game:
             self.restart()
 
     def kill(self, player_id, crr_time):
+        if not self.IDs[player_id]: return
+
         target_player = self.players[player_id]
-        
-        print(f"Target player pos: {target_player.pos}")
         op = randint(1, 4)
         if op == 2:
             self.jail_item.spawn(target_player.pos)
