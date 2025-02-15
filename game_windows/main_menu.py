@@ -75,7 +75,7 @@ class Panel:
         if server_error:
             server_msg_font = pg.font.SysFont("Arial", 20)
             server_msg_text = server_msg_font.render(server_msg + ". Clique para tentar novamente", True, (255, 0, 0))
-            self.screen.blit(server_msg_text, (self.center_x - server_msg_text.get_width() // 2, 400))
+            self.screen.blit(server_msg_text, (self.center_x - server_msg_text.get_width() // 2, 280))
 
 class PlayerWindow:
     def __init__(self, rect, texture, id):
