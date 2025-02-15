@@ -3,6 +3,7 @@ from math import sqrt
 from time import time
 from modules.weapon import Weapon
 from shared.character import CharacterBaseData
+from modules.weapon import Granade
 
 class Enemy(CharacterBaseData):
     def __init__(self, id, name):
@@ -18,6 +19,8 @@ class Enemy(CharacterBaseData):
     
         self.weapon = Weapon()
         self.jail_textures = None
+        
+        self.granade = Granade()
 
     def reset_name(self, name):
         self.name = name
@@ -49,7 +52,7 @@ class Enemy(CharacterBaseData):
         # Nome
         text_rect = self.name_text.get_rect(center=(pos_x, pos_y - self.size - 15))
         screen.blit(self.name_text, text_rect)
-        
+
         # Frame do player
         frame_y = 64 if self.dir else 0
         frame_x = int((crr_time * 6) % 3) * 64 if self.run else 128
@@ -59,6 +62,8 @@ class Enemy(CharacterBaseData):
         # Arma
         r_cursor_pos = self.cursor_pos - self.interpolated_pos
         self.weapon.draw(screen, self.interpolated_pos, r_cursor_pos, self.attack_ts)
+        
+        self.granade.draw(screen)
 
         if draw_jail:
             screen.blit(self.jail_textures[1], pos_jail)

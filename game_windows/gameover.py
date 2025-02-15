@@ -1,5 +1,6 @@
 import pygame as pg
 from time import time
+from random import randint
 
 class GameOver:
     def __init__(self, app, game_manager):
@@ -16,6 +17,9 @@ class GameOver:
         
         self.end_time = 0
         self.countdown = 0
+        self.winner = 0
+        self.winner_ts = 0
+        self.play_sound_ts = 0
 
         self.player_windows = [pg.Rect(100 + (i % 2) * 910, 100 + (i // 2) * 300, 80, 80) for i in range(4)]
     def update(self):
@@ -35,6 +39,14 @@ class GameOver:
         self.screen.fill((80, 80, 80))
         
         self.screen.blit(self.manager.UI_background, (0, 0))
+        
+        if time() - self.winner_ts < 0.1 and time() - self.play_sound_ts > 10:
+            if self.winner:
+                self.manager.win_sound.play()
+            else:
+                i = randint(0, 1)
+                self.manager.defeat_sound[i].play()
+            self.play_sound_ts = time()
 
         self.draw_result()
         self.draw_score()
@@ -49,7 +61,9 @@ class GameOver:
         self.manager.flip()
 
     def draw_result(self):
-        result = "Vitória" if self.manager.placar[self.manager.player.team] == max(self.manager.placar) else "Derrota"
+        self.winner = self.manager.placar[self.manager.player.team] == max(self.manager.placar)
+        self.winner_ts = time()
+        result = "Vitória" if self.winner else "Derrota"
         font = self.font_vitoria if result == "Vitória" else self.font_derrota
         result_text = font.render(result, True, (255, 0, 255))
         self.screen.blit(result_text, (self.screen_width / 2 - result_text.get_width() / 2, self.screen_height / 4))

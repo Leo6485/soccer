@@ -36,40 +36,49 @@ class GameManager:
         
         self.screen = pg.display.set_mode(res, pg.SCALED | pg.FULLSCREEN)
         
-        
-        # Display design e escalas
-        self.D = pg.Vector2(res)
-        self.DD = pg.Vector2(1366, 768)
-        self.scale = min(self.D.x / self.DD.x, self.D.y / self.DD.y)
-        self.padding = pg.Vector2((self.D.x - self.DD.x * self.scale) / 2, (self.D.y - self.DD.y * self.scale) / 2)
-        
-        # Se for menor do que 1, preciso desenhar em uma surface para reescalar posteriormente
-        if self.scale < 1:
-            self.screen = pg.Surface((1366, 768)).convert()
-
-        # Carrega as texturas
+        self.setup_scale(res)
         self.load_textures()
 
-        pg.mixer.init()
-        self.music = pg.mixer.music.load("assets/sounds/letx27s-get-this-done-154533.mp3")
-        pg.mixer.music.play(-1)
-        
-        self.shotgun_sound = pg.mixer.Sound("assets/sounds/shotgun.mp3")
+        self.init_music()
+        self.init_sounds()
+
         print(f"Resolução: {res}")
         print(f"Escala: {self.scale}")
 
-        # Servidor e primeira conexão
         self.connect()
-        # Janelas
-        self.game = Game(self.app, self)
-        self.main_menu = MainMenu(self.app, self)
-        self.gameover = GameOver(self.app, self)
+        self.init_windows()
     
+    def setup_scale(self, res):
+        self.D = pg.Vector2(res)
+        self.DD = pg.Vector2(1366, 768)
+
+        self.D = pg.Vector2(self.screen.get_size())
+        self.scale = min(self.D.x / self.DD.x, self.D.y / self.DD.y)
+        self.padding = pg.Vector2((self.D.x - self.DD.x * self.scale) / 2, (self.D.y - self.DD.y * self.scale) / 2)
+        
+        if self.scale < 1:
+            self.screen = pg.Surface((1366, 768)).convert()
+
     def connect(self, force=False):
         self.server_msg = ""
         self.server_error = 0
         data = {"type": "CONNECT", "data": {"name": self.player.name, "force_connection": force}}
         self.app.send(data)
+    
+    def init_windows(self):
+        self.game = Game(self.app, self)
+        self.main_menu = MainMenu(self.app, self)
+        self.gameover = GameOver(self.app, self)
+    
+    def init_music(self):
+        pg.mixer.music.stop()
+        pg.mixer.music.load("assets/sounds/letx27s-get-this-done-154533.mp3")
+        pg.mixer.music.play(-1)
+
+    def init_sounds(self):
+        self.shotgun_sound = pg.mixer.Sound("assets/sounds/shotgun.mp3")
+        self.win_sound = pg.mixer.Sound("assets/sounds/win/1.mp3")
+        self.defeat_sound = [pg.mixer.Sound("assets/sounds/defeat/1.mp3"), pg.mixer.Sound("assets/sounds/defeat/2.mp3")]
 
     def flip(self):
         if self.scale < 1:
@@ -85,6 +94,7 @@ class GameManager:
         self.jail_textures = self.load_textures_from_path("assets/textures/items", ["jail_back.png", "jail_front.png"], (128, 128))
         self.granade = self.load_texture("assets/textures/player/v2/granade.png", (64, 64))
         self.explosion = self.load_texture("assets/textures/player/v2/explosion.png", (2048, 2048))
+        self.skull_texture = self.load_texture("assets/textures/player/v2/skull.png", (64, 64))
         
         # UI
         self.UI_player_textures = self.load_textures_from_path("assets/textures/UI", ["UI_duck_1.png", "UI_duck_2.png"], (2048, 256))
@@ -124,6 +134,7 @@ class GameManager:
                 self.game.draw()
             
             pg.mouse.set_visible(1)
+            pg.mixer.music.stop()
             while self.crr_screen == "gameover" and self.running:
                 self.gameover.update()
                 self.gameover.draw()
@@ -160,6 +171,8 @@ class GameManager:
             enemy.last_update = crr_time
             enemy.attack_ts = player["attack_ts"]
             enemy.skills = player["skills"]
+            enemy.granade.launch_ts = player["granade_launch_ts"]
+            enemy.granade.pos = player["granade_pos"]
             if crr_time - enemy.respawn_ts < 1:
                 enemy.reset_name(player["name"])
             if enemy.name != player["name"]:
@@ -171,5 +184,6 @@ class GameManager:
             enemy.weapon.texture = self.weapon_textures[id % 2]
             enemy.weapon.sound = self.shotgun_sound
             enemy.jail_textures = self.jail_textures
+            enemy.granade.texture = self.granade
             enemy.last_update = crr_time
             self.players[id] = enemy

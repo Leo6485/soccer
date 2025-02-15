@@ -104,6 +104,7 @@ class Game:
         self.crr_screen = "mainmenu"
         self.started = False
         self.game_end_ts = 0
+        self.score_limmit = 5
 
         self.players = {}
         self.clients = {}
@@ -159,6 +160,7 @@ class Game:
             player.check_inactive(crr_time, self)
             player.handle_attack(crr_time, self)
             player.handle_skills(crr_time, self)
+            player.handle_granade(crr_time, self)
             player.collect_skills(self)
 
     def update_ball(self, delta_time):
@@ -190,7 +192,7 @@ class Game:
         self.ball.vel = Vector2(0, 0)
 
     def update_screen(self, crr_time):
-        if 5 in self.placar and self.crr_screen == "ingame":
+        if self.score_limmit in self.placar and self.crr_screen == "ingame":
             self.crr_screen = "gameover"
             self.game_end_ts = crr_time
         if self.crr_screen == "gameover" and crr_time - self.game_end_ts > 5:
@@ -314,6 +316,8 @@ class App:
                 player.attack_ts = data["attack_ts"]
                 player.attack_target = data["attack_target"]
                 player.skills = data["skills"]
+                player.granade_launch_ts = data["granade_ts"]
+                player.granade_pos = data["granade_pos"]
 
         @app.server.route("QUIT")
         def quit(data, addr):

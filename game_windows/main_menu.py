@@ -4,12 +4,14 @@ class Button:
     def __init__(self, pos, texture, texture_on_hover, text, font):
         self.rect = texture.get_rect(x=pos.x, y=pos.y)
         self.texture = texture
-        self.texture_on_hover = texture_on_hover  # Fix assignment here
+        self.texture_on_hover = texture_on_hover
         self.text = text
         self.font = font
         self.hovered = False
+        self.clicked = False
 
     def update(self, event_list, scale, padding):
+        self.clicked = False
         mouse_pos = pg.mouse.get_pos()
         scaled_mouse_pos = ((mouse_pos[0] - padding.x) / scale, (mouse_pos[1] - padding.y) / scale)
 
@@ -17,10 +19,9 @@ class Button:
             self.hovered = True
             for event in event_list:
                 if event.type == pg.MOUSEBUTTONUP and event.button == 1:
-                    return True
+                    self.clicked = True
         else:
             self.hovered = False
-        return False
 
     def draw(self, screen):
         if self.hovered:
@@ -135,7 +136,8 @@ class SettingsWindow:
         else:
             pg.mixer.music.set_volume(1)
 
-        if self.ok_button.update(event_list, scale, padding):
+        self.ok_button.update(event_list, scale, padding)
+        if self.ok_button.clicked:
             self.open = False
 
     def draw(self):
@@ -202,19 +204,22 @@ class MainMenu:
         event_list = pg.event.get()
         self.handle_events(event_list)
 
-        if self.start_button.update(event_list, self.manager.scale, self.manager.padding):
-            if not self.manager.server_error:
+        self.start_button.update(event_list, self.manager.scale, self.manager.padding)
+        self.settings_button.update(event_list, self.manager.scale, self.manager.padding)
+        self.exit_button.update(event_list, self.manager.scale, self.manager.padding)
+
+        if self.start_button.clicked:
+            if not self.manager.server_error and any(self.manager.IDs):
                 self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame", "name": self.name}})
                 self.running = False
-
-            elif self.manager.server_error:
+            else:
                 self.manager.connect(force=True)
                 self.running = False
 
-        if self.settings_button.update(event_list, self.manager.scale, self.manager.padding):
+        if self.settings_button.clicked:
             self.settings_window.open = True
 
-        if self.exit_button.update(event_list, self.manager.scale, self.manager.padding):
+        if self.exit_button.clicked:
             self.manager.running = False
 
         self.settings_window.update(event_list, self.manager.scale, self.manager.padding)
@@ -226,11 +231,6 @@ class MainMenu:
 
         for i, window in enumerate(self.player_windows):
             window.update(self.manager.IDs[i])
-
-        # Ensure buttons are updated correctly
-        self.start_button.update(event_list, self.manager.scale, self.manager.padding)
-        self.settings_button.update(event_list, self.manager.scale, self.manager.padding)
-        self.exit_button.update(event_list, self.manager.scale, self.manager.padding)
 
     def draw(self):
         self.screen.fill((80, 80, 80))

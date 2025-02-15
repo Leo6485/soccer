@@ -111,11 +111,14 @@ class Player(CharacterBaseData):
             if self.skills["invisibility"]["has"]:
                 self.skills["invisibility"]["use_ts"] = time()
         
-        if pressed[pg.K_e]:
+        # Granada
+        if pressed[pg.K_e] and self.granade.has and time() - self.granade.launch_ts > 5 and not self.in_jail() and not self.in_respawn():
             self.granade.launch_ts = time()
             self.granade.pos = self.pos + (1, 1)
             self.granade.launch_pos = self.pos + (2, 2)
             self.granade.vel = pg.Vector2(self.cursor.pos.x / 4, self.cursor.pos.y / 4)
+        
+        self.granade.update()
 
         self.update_data()
 
@@ -129,17 +132,19 @@ class Player(CharacterBaseData):
                         "run": self.run,
                         "dir": self.dir,
                         "name": self.name,
-                        "skills": self.skills
+                        "skills": self.skills,
+                        "granade_ts": self.granade.launch_ts,
+                        "granade_pos": self.granade.pos
                      }
 
-    def draw_progress_bar(self, screen, progress):
+    def draw_progress_bar(self, screen, progress, color=(0, 255, 0), bg_color=(0, 100, 0), y_offset=10):
         bar_width = 50
         bar_height = 5
         x = self.pos.x - bar_width / 2
-        y = self.pos.y + self.size + 10
+        y = self.pos.y + self.size + y_offset
 
-        pg.draw.rect(screen, (0, 100, 0), (x, y, bar_width, bar_height))
-        pg.draw.rect(screen, (0, 255, 0), (x, y, bar_width * progress, bar_height))
+        pg.draw.rect(screen, bg_color, (x, y, bar_width, bar_height))
+        pg.draw.rect(screen, color, (x, y, bar_width * progress, bar_height))
     def draw(self, screen):
         crr_time = time()
         pos_jail = (self.pos.x - 64, self.pos.y - 80)
@@ -163,15 +168,19 @@ class Player(CharacterBaseData):
         self.weapon.draw(screen, self.pos, self.cursor.pos, self.attack_ts)
         
         # Granada
-        self.granade.draw(screen, self.pos, self.cursor.pos, self.attack_ts)
+        self.granade.draw(screen)
 
         # Nome
         text_rect = self.name_text.get_rect(center=(self.pos.x, self.pos.y - self.size - 15))
         screen.blit(self.name_text, text_rect)
-        
-        # Barra de cooldown
+
+        # Barra de cooldown da arma
         progress = min((crr_time - self.last_attack) / 0.5, 1)
         self.draw_progress_bar(screen, progress)
+        
+        # Barra de cooldown da granada
+        progress = min((crr_time - self.granade.launch_ts) / 5, 1)
+        self.draw_progress_bar(screen, progress, (255, 255, 0), (100, 100, 0), 20)
 
         if draw_jail:
             screen.blit(self.jail_textures[1], pos_jail)

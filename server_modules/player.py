@@ -11,12 +11,6 @@ class Player(CharacterBaseData):
             "invisibility": {"has": 0, "use_ts": 0, "effect_ts": 0}
         }
 
-    def in_respawn(self):
-        return time() - self.respawn_ts < 1.5
-
-    def in_jail(self):
-        return time() - self.skills["jail"]["effect_ts"] < 1.5
-
     def check_inactive(self, crr_time, game):
         if crr_time - self.last_update > 1:
             game.IDs[self.id] = False
@@ -59,6 +53,18 @@ class Player(CharacterBaseData):
         if crr_time - use_invisibility_ts < 0.5 and has_invisibility:
             self.skills["invisibility"]["effect_ts"] = crr_time
             self.skills["invisibility"]["has"] = 0
+    
+    def handle_granade(self, crr_time, game):
+        launch_ts = self.granade_launch_ts
+        if 0.5 < crr_time - launch_ts < 0.6:
+            for player in game.players.values():
+                if player.id % 2 == self.id % 2 and player.id != self.id:
+                    continue
+
+                distance = (player.pos - self.granade_pos).length()
+                if distance < 100:
+                    game.kill(player.id, crr_time)
+                    print(f"Player {self.id} matou player {player.id} com uma granada")
 
     def collect_skills(self, game):
         if game.jail_item.check(self.pos):

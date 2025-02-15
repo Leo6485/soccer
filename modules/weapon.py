@@ -40,22 +40,26 @@ class Granade:
         self.pos = pg.Vector2(0, 0)
         self.launch_pos = pg.Vector2(0, 0)
         self.launch_ts = 0
+        self.has = 2
     
-    def draw(self, screen, launch_pos, cursor_pos, attack_ts):
+    def update(self):
         if not self.texture: return
-        
-        elapsed_time = time() - self.launch_ts
 
+        elapsed_time = time() - self.launch_ts
+        
         if elapsed_time < 0.5:
             self.vel.x *= 0.98
             self.vel.y *= 0.98
             
-            # if self.pos.y >= (self.launch_pos.y + 50):
-            #     self.vel.y = 0
-
             self.pos += self.vel
 
-            # pg.draw.circle(screen, (255, 255, 255), self.pos, 5)
+    def draw(self, screen):
+        if not self.texture: return
+
+        elapsed_time = time() - self.launch_ts
+        
+        if elapsed_time < 0.5:
+            pg.draw.circle(screen, (255, 255, 255), self.pos, 5)
             screen.blit(pg.transform.rotate(self.texture, elapsed_time * 10), (self.pos.x - 32, self.pos.y - 32, 64, 64))
         elif elapsed_time < 0.6:
             pg.draw.circle(screen, (255, 255, 100), self.pos, 100)
