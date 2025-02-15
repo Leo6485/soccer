@@ -68,7 +68,7 @@ class Player(CharacterBaseData):
             self.pos.y += self.cursor.delta.y * self.vel
             self.pos.x += self.cursor.delta.x * self.vel
         
-        if time() - self.attack_ts  < 0.1 and not self.run:
+        if time() - self.attack_ts  < 0.1 and not self.run and not self.in_jail() and not self.in_respawn():
             self.pos -= self.cursor.delta * 0.02
         ########## Reage com a bola ##########
         coll = ball.calc_dist(self.pos)
@@ -112,12 +112,18 @@ class Player(CharacterBaseData):
                 self.skills["invisibility"]["use_ts"] = time()
         
         # Granada
-        if pressed[pg.K_e] and self.granade.has and time() - self.granade.launch_ts > 5 and not self.in_jail() and not self.in_respawn():
+        if pressed[pg.K_e] and time() - self.granade.launch_ts > 5 and not self.in_jail() and not self.in_respawn():
             self.granade.launch_ts = time()
             self.granade.pos = self.pos + (1, 1)
             self.granade.launch_pos = self.pos + (2, 2)
             self.granade.vel = pg.Vector2(self.cursor.pos.x / 4, self.cursor.pos.y / 4)
         
+        if pressed[pg.K_r] and time() - self.granade.launch_ts > 5 and not self.in_jail() and not self.in_respawn():
+            self.granade.launch_ts = time()
+            self.granade.pos = self.pos + (1, 1)
+            self.granade.launch_pos = self.pos + (2, 2)
+            self.granade.vel = pg.Vector2(0, 0)
+
         self.granade.update()
 
         self.update_data()

@@ -40,8 +40,7 @@ class Granade:
         self.pos = pg.Vector2(0, 0)
         self.launch_pos = pg.Vector2(0, 0)
         self.launch_ts = 0
-        self.has = 2
-    
+
     def update(self):
         if not self.texture: return
 
