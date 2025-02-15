@@ -59,15 +59,17 @@ class GameManager:
         print(f"Escala: {self.scale}")
 
         # Servidor e primeira conexão
-        self.server_msg = ""
-        self.server_error = 0
-        data = {"type": "CONNECT", "data": {"name": self.player.name}}
-        self.app.send(data)
-        
+        self.connect()
         # Janelas
         self.game = Game(self.app, self)
         self.main_menu = MainMenu(self.app, self)
         self.gameover = GameOver(self.app, self)
+    
+    def connect(self, force=False):
+        self.server_msg = ""
+        self.server_error = 0
+        data = {"type": "CONNECT", "data": {"name": self.player.name, "force_connection": force}}
+        self.app.send(data)
 
     def flip(self):
         if self.scale < 1:
@@ -82,11 +84,16 @@ class GameManager:
         self.weapon_textures = self.load_textures_from_path("assets/textures/player/v2", ["shotgun_1.png", "shotgun_2.png"], (192, 64))
         self.jail_textures = self.load_textures_from_path("assets/textures/items", ["jail_back.png", "jail_front.png"], (128, 128))
         self.granade = self.load_texture("assets/textures/player/v2/granade.png", (64, 64))
+        self.explosion = self.load_texture("assets/textures/player/v2/explosion.png", (2048, 2048))
         
         # UI
         self.UI_player_textures = self.load_textures_from_path("assets/textures/UI", ["UI_duck_1.png", "UI_duck_2.png"], (2048, 256))
-        self.UI_start_button_texture = self.load_texture("assets/textures/UI/start_button.png", (768, 128))
+        self.UI_btt_orange = self.load_texture("assets/textures/UI/btt_orange_round.png", (256, 96))
+        self.UI_btt_green = self.load_texture("assets/textures/UI/btt_green_round.png", (256, 96))
+        self.UI_btt_grey = self.load_texture("assets/textures/UI/btt_round.png", (256, 96))
+        self.UI_text_input_grey = self.load_texture("assets/textures/UI/text_input_grey.png", (372, 72))
         self.UI_background = self.load_texture("assets/textures/UI/background.png", (1366, 768))
+        self.UI_btt_x = self.load_texture("assets/textures/UI/btt_x.png", (64, 64))
 
     def load_texture(self, path, size):
         texture = pg.image.load(path).convert_alpha()

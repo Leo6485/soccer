@@ -39,6 +39,7 @@ class App:
             self.game_manager.player.weapon.sound =self.game_manager.shotgun_sound
             
             self.game_manager.player.granade.texture = self.game_manager.granade
+            self.game_manager.player.granade.explosion_texture = self.game_manager.explosion
 
             self.game_manager.player.jail_textures = self.game_manager.jail_textures
             self.game_manager.players[data["id"]] = self.game_manager.player
@@ -53,3 +54,4 @@ class App:
         def server_msg(data, addr):
             self.game_manager.server_msg = data.get("text", "")
             self.game_manager.server_error = data.get("error", 0)
+            

@@ -276,11 +276,12 @@ class App:
         def connect(data, addr):
             crr_time = time()
             player_id = self.game.get_free_id()
+            force_connection = data.get("force_connection", False)
             if player_id is None:
-                return {"type": "servermsg", "data": {"text": "O servidor está lotado", "error": 1}}
-            if self.game.crr_screen == "ingame":
+                return {"type": "servermsg", "data": {"text": "Servidor cheio", "error": 1}}
+            if not force_connection and self.game.crr_screen == "ingame":
                 self.game.IDs[player_id] = False
-                return {"type": "servermsg", "data": {"text": "O servidor está em partida", "error": 1}}
+                return {"type": "servermsg", "data": {"text": "Em partida", "error": 2}}
 
             player_data = Player(
                 addr=addr,
