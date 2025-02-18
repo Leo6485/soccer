@@ -41,7 +41,7 @@ class Granade:
         self.launch_pos = pg.Vector2(0, 0)
         self.launch_ts = 0
 
-    def update(self):
+    def update(self, players, team):
         if not self.texture: return
 
         elapsed_time = time() - self.launch_ts
@@ -51,6 +51,14 @@ class Granade:
             self.vel.y *= 0.98
             
             self.pos += self.vel
+        
+        for p_id, p in players.items():
+            if p.id % 2 == team: continue
+            d_to_p = self.pos.distance_to(p.pos)
+            
+            if d_to_p < 25 and elapsed_time < 0.5:
+                self.launch_ts = time() - 0.5
+                
 
     def draw(self, screen):
         if not self.texture: return

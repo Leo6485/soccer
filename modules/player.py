@@ -124,7 +124,7 @@ class Player(CharacterBaseData):
             self.granade.launch_pos = self.pos + (2, 2)
             self.granade.vel = pg.Vector2(0, 0)
 
-        self.granade.update()
+        self.granade.update(players, self.id % 2)
 
         self.update_data()
 

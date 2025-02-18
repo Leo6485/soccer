@@ -34,17 +34,22 @@ class Button:
         screen.blit(text_surface, text_rect)
 
 class Panel:
-    def __init__(self, screen, title, title_font, input_box, input_font, button, settings_button, exit_button, center_x, input_texture):
+    def __init__(self, screen, manager):
         self.screen = screen
-        self.title = title
-        self.title_font = title_font
-        self.input_box = input_box
-        self.input_font = input_font
-        self.button = button
-        self.settings_button = settings_button
-        self.exit_button = exit_button
-        self.center_x = center_x
-        self.input_texture = input_texture
+        self.manager = manager
+        self.title = "Insira seu nome"
+        self.title_font = pg.font.SysFont("Arial", 48)
+        self.input_font = pg.font.SysFont("Arial", 36)
+        self.center_x = 1000
+        self.input_texture = manager.UI_text_input_grey
+
+        # Input box
+        self.input_box = self.input_texture.get_rect(x=0, y=200)
+
+        # Buttons
+        self.button = Button(pg.Vector2(0, 350), manager.UI_btt_green, manager.UI_btt_grey, "Jogar", self.title_font)
+        self.settings_button = Button(pg.Vector2(0, 0), manager.UI_btt_green, manager.UI_btt_grey, "Opções", self.title_font)
+        self.exit_button = Button(pg.Vector2(0, 400), manager.UI_btt_orange, manager.UI_btt_grey, "Sair", self.title_font)
 
     def draw(self, name, server_error, server_msg):
         # Input title
@@ -155,33 +160,14 @@ class MainMenu:
         self.manager = game_manager
         self.screen = self.manager.screen
         
-        self.font = pg.font.SysFont("Arial", 48)
-        self.input_font = pg.font.SysFont("Arial", 36)
-
         self.name = self.manager.player.name
         self.running = True
-        
-        # Input para o nome
-        self.name_input_box = self.manager.UI_text_input_grey.get_rect(x=0, y=200)
-
-        # Start Button
-        pos = pg.Vector2(0, 350)
-        self.start_button = Button(pos, self.manager.UI_btt_green, self.manager.UI_btt_grey, "Jogar", self.font)
-
-        # Settings Button
-        pos_settings = pg.Vector2(0, 0)  # Initial position, will be set in Panel
-        self.settings_button = Button(pos_settings, self.manager.UI_btt_green, self.manager.UI_btt_grey, "Opções", self.font)
-        self.settings_open = False
-        
-        # Exit Button
-        pos = pg.Vector2(0, 400)
-        self.exit_button = Button(pos, self.manager.UI_btt_orange, self.manager.UI_btt_grey, "Sair", self.font)
 
         # Settings Window
-        self.settings_window = SettingsWindow(self.screen, self.font, self.manager.UI_btt_green, self.manager.UI_btt_grey)
+        self.settings_window = SettingsWindow(self.screen, pg.font.SysFont("Arial", 48), self.manager.UI_btt_green, self.manager.UI_btt_grey)
         
         # Panel
-        self.panel = Panel(self.screen, "Insira seu nome", self.font, self.name_input_box, self.input_font, self.start_button, self.settings_button, self.exit_button, center_x=1000, input_texture=self.manager.UI_text_input_grey)
+        self.panel = Panel(self.screen, self.manager)
         self.player_windows = [PlayerWindow(pg.Rect(100 + (i % 2) * 300, 100 + (i // 2) * 300, 80, 80), self.manager.UI_player_textures[i % 2], i) for i in range(4)]
 
         self.frame = [0] * 4
@@ -204,11 +190,11 @@ class MainMenu:
         event_list = pg.event.get()
         self.handle_events(event_list)
 
-        self.start_button.update(event_list, self.manager.scale, self.manager.padding)
-        self.settings_button.update(event_list, self.manager.scale, self.manager.padding)
-        self.exit_button.update(event_list, self.manager.scale, self.manager.padding)
+        self.panel.button.update(event_list, self.manager.scale, self.manager.padding)
+        self.panel.settings_button.update(event_list, self.manager.scale, self.manager.padding)
+        self.panel.exit_button.update(event_list, self.manager.scale, self.manager.padding)
 
-        if self.start_button.clicked:
+        if self.panel.button.clicked:
             if not self.manager.server_error and any(self.manager.IDs):
                 self.app.send({"type": "setscreen", "data": {"crr_screen": "ingame", "name": self.name}})
                 self.running = False
@@ -216,10 +202,10 @@ class MainMenu:
                 self.manager.connect(force=True)
                 self.running = False
 
-        if self.settings_button.clicked:
+        if self.panel.settings_button.clicked:
             self.settings_window.open = True
 
-        if self.exit_button.clicked:
+        if self.panel.exit_button.clicked:
             self.manager.running = False
 
         self.settings_window.update(event_list, self.manager.scale, self.manager.padding)
