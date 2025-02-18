@@ -112,13 +112,13 @@ class Player(CharacterBaseData):
                 self.skills["invisibility"]["use_ts"] = time()
         
         # Granada
-        if pressed[pg.K_e] and time() - self.granade.launch_ts > 5 and not self.in_jail() and not self.in_respawn():
+        if pressed[pg.K_e] and time() - self.granade.launch_ts > 8 and not self.in_jail() and not self.in_respawn():
             self.granade.launch_ts = time()
             self.granade.pos = self.pos + (1, 1)
             self.granade.launch_pos = self.pos + (2, 2)
             self.granade.vel = pg.Vector2(self.cursor.pos.x / 4, self.cursor.pos.y / 4)
         
-        if pressed[pg.K_r] and time() - self.granade.launch_ts > 5 and not self.in_jail() and not self.in_respawn():
+        if pressed[pg.K_r] and time() - self.granade.launch_ts > 8 and not self.in_jail() and not self.in_respawn():
             self.granade.launch_ts = time()
             self.granade.pos = self.pos + (1, 1)
             self.granade.launch_pos = self.pos + (2, 2)
@@ -185,7 +185,7 @@ class Player(CharacterBaseData):
         self.draw_progress_bar(screen, progress)
         
         # Barra de cooldown da granada
-        progress = min((crr_time - self.granade.launch_ts) / 5, 1)
+        progress = min((crr_time - self.granade.launch_ts) / 8, 1)
         self.draw_progress_bar(screen, progress, (255, 255, 0), (100, 100, 0), 20)
 
         if draw_jail:
