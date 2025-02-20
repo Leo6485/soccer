@@ -162,6 +162,7 @@ class Game:
             player.handle_skills(crr_time, self)
             player.handle_granade(crr_time, self)
             player.collect_skills(self)
+            player.check_pos(self, crr_time)
 
     def update_ball(self, delta_time):
         self.ball.update(self.players, self.display, self.IDs, delta_time)
@@ -170,7 +171,7 @@ class Game:
 
     def check_goal(self, crr_time):
         gol = False
-        
+
         # Gol
         if self.ball.pos.x < 150 and 250 < self.ball.pos.y < 518:
             self.reset_ball()

@@ -72,3 +72,9 @@ class Player(CharacterBaseData):
         
         if game.invisibility_item.check(self.pos):
             self.skills["invisibility"]["has"] = 1
+    
+    def check_pos(self, game, crr_time):
+        if (self.pos.x < -200 or self.pos.x > 1566 or 
+            self.pos.y < -200 or self.pos.y > 968):
+            game.kill(self.id, crr_time)
+            print(f"Player {self.id} morreu por sair do mapa")
